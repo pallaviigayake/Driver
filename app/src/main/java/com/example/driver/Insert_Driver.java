@@ -58,6 +58,7 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.driver.model.CasesondrivinglicModel;
 import com.example.driver.model.CityModel;
+import com.example.driver.model.Datum;
 import com.example.driver.model.DistrictModel;
 import com.example.driver.model.DrivenToModel;
 import com.example.driver.model.LicensetypeModel;
@@ -89,6 +90,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
@@ -99,16 +101,11 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class Insert_Driver extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
-
-        Intent intent = new Intent(Insert_Driver.this, MainActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 /*
         MainActivity.li_insertdriver.setBackgroundDrawable(getResources().getDrawable(R.drawable.corner_radius_dashbord));
         MainActivity.li_updateprofile.setBackgroundDrawable(getResources().getDrawable(R.drawable.corner_radius_dashbord));
         MainActivity.rel_driverReport.setBackgroundDrawable(getResources().getDrawable(R.drawable.corner_radius_dashbord));*/
-        startActivity(intent);
+
 
     }
     KProgressHUD dialog;
@@ -178,7 +175,7 @@ public class Insert_Driver extends AppCompatActivity implements AdapterView.OnIt
     ArrayList<String> arrayList;
     ArrayList<SalaryModel> arrayList_salary;
     ArrayList<QualificationModel> arrayList_qulification;
-    ArrayList<LicensetypeModel> arrayList_licensetype;
+    ArrayList<Datum> arrayList_licensetype;
     ArrayList<CasesondrivinglicModel> arrayList_casesondrivinglicense;
 
     private final int PICK_IMAGE_CAMERA = 3, PICK_IMAGE_GALLERY = 2;
@@ -454,13 +451,13 @@ public class Insert_Driver extends AppCompatActivity implements AdapterView.OnIt
     }
 
     private void init() {
+
         getCityList();
         getLocalCityList();
         getStateList();
         getDistrict();
         getDrivento();
         getDrivenfrom();
-
         getsalary();
         getqulification();
         getlicense_type();
@@ -1035,7 +1032,7 @@ public class Insert_Driver extends AppCompatActivity implements AdapterView.OnIt
                         if (error == false) {
                             String message = jsonObject1.getString("message");
                             JSONArray jsonArray = jsonObject1.getJSONArray("data");
-                            for (int i = 0; i <= jsonArray.length(); i++) {
+                            for (int i = 0; i < jsonArray.length(); i++) {
                                 JSONObject jsonObject11 = jsonArray.getJSONObject(i);
                                 String id = jsonObject11.getString("id");
                                 String salary_expectation = jsonObject11.getString("salary_expectation");
@@ -1125,7 +1122,7 @@ public class Insert_Driver extends AppCompatActivity implements AdapterView.OnIt
                         if (error == false) {
                             String message = jsonObject1.getString("message");
                             JSONArray jsonArray = jsonObject1.getJSONArray("data");
-                            for (int i = 0; i <= jsonArray.length(); i++) {
+                            for (int i = 0; i < jsonArray.length(); i++) {
                                 JSONObject jsonObject11 = jsonArray.getJSONObject(i);
                                 String id = jsonObject11.getString("id");
                                 String Qualification = jsonObject11.getString("Qualification");
@@ -1201,6 +1198,12 @@ public class Insert_Driver extends AppCompatActivity implements AdapterView.OnIt
 
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        dialog.dismiss();
+    }
+
     public void getlicense_type() {
 
         dialog.show();
@@ -1210,22 +1213,33 @@ public class Insert_Driver extends AppCompatActivity implements AdapterView.OnIt
                 public void onResponse(String response) {
                     //cityModelArrayList = getJson(response);
                     try {
-                        JSONObject jsonObject1 = new JSONObject(response);
-                        boolean error = jsonObject1.getBoolean("error");
-                        if (error == false) {
-                            String message = jsonObject1.getString("message");
-                            JSONArray jsonArray = jsonObject1.getJSONArray("data");
-                            for (int i = 0; i <= jsonArray.length(); i++) {
-                                JSONObject jsonObject11 = jsonArray.getJSONObject(i);
-                                String id = jsonObject11.getString("id");
-                                String type = jsonObject11.getString("type");
-                                LicensetypeModel licensetypeModel = new LicensetypeModel(id, type);
-                                licensetypeModel.setId(id);
-                                licensetypeModel.setId(type);
-                                arrayList_licensetype.add(licensetypeModel);
-                            }
-                        }
-                    } catch (JSONException e) {
+
+
+                        LicensetypeModel ob=new Gson().fromJson(response,LicensetypeModel.class);
+                        Log.e("Response",response);
+if( !                       ob.getError()){
+
+
+    arrayList_licensetype=new ArrayList<>();
+    arrayList_licensetype=ob.getData();
+}
+//                        JSONObject jsonObject1 = new JSONObject(response);
+//                        boolean error = jsonObject1.getBoolean("error");
+//                        if (error == false) {
+//                            String message = jsonObject1.getString("message");
+//                            JSONArray jsonArray = jsonObject1.getJSONArray("data");
+//                            for (int i = 0; i <= jsonArray.length(); i++) {
+//
+//                                JSONObject jsonObject11 = jsonArray.getJSONObject(i);
+//                                String id = jsonObject11.getString("id");
+//                                String type = jsonObject11.getString("type");
+//                                LicensetypeModel licensetypeModel = new LicensetypeModel(id, type);
+//                                licensetypeModel.setId(id);
+//                                licensetypeModel.setId(type);
+//                                arrayList_licensetype.add(licensetypeModel);
+//                            }
+//                        }
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
 
@@ -1238,8 +1252,9 @@ public class Insert_Driver extends AppCompatActivity implements AdapterView.OnIt
 
                     for (int i = 0; i < arrayList_licensetype.size(); i++) {
 
-                        license_typeId.add(arrayList_licensetype.get(i).getId().toString());
-                        license_typeName.add(arrayList_licensetype.get(i).getType().toString());
+                        license_typeId.add(""+arrayList_licensetype.get(i).getId());
+                        license_typeName.add(""+arrayList_licensetype.get(i).getType());
+
 
 
                     }
@@ -1305,7 +1320,7 @@ public class Insert_Driver extends AppCompatActivity implements AdapterView.OnIt
                         if (error == false) {
                             String message = jsonObject1.getString("message");
                             JSONArray jsonArray = jsonObject1.getJSONArray("data");
-                            for (int i = 0; i <= jsonArray.length(); i++) {
+                            for (int i = 0; i < jsonArray.length(); i++) {
                                 JSONObject jsonObject11 = jsonArray.getJSONObject(i);
                                 String id = jsonObject11.getString("id");
                                 String Cases_On_Driving_License = jsonObject11.getString("Cases_On_Driving_License");

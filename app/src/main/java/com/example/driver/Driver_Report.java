@@ -37,6 +37,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Driver_Report extends AppCompatActivity {
+
     ImageView iv_Back_report;
     EditText et_totaldriver, et_currentmonth;
     boolean isConnected;
@@ -164,8 +165,8 @@ public class Driver_Report extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
+        /*super.onBackPressed();
         Intent intent=new Intent(Driver_Report.this,MainActivity.class);
-        startActivity(intent);
+        startActivity(intent);*/
          }
 }
