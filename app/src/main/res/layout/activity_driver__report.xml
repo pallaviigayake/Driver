@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorredredall"
+    android:orientation="vertical"
+    tools:context=".Driver_Report">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="0dp"
+            android:background="@color/colorredredall"
+            android:minHeight="?attr/actionBarSize"
+            android:theme="?attr/actionBarTheme">
+
+            <ImageView
+                android:id="@+id/iv_Back_report"
+                android:layout_width="30dp"
+                android:layout_height="50dp"
+                android:tint="@color/colorWhite"
+                app:srcCompat="@drawable/ic_baseline_arrow_back_24" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:text="Driver Report"
+                android:textColor="@color/colorWhite"
+                android:textSize="35sp"
+                android:textStyle="bold">
+
+            </TextView>
+        </androidx.appcompat.widget.Toolbar>
+
+
+    </LinearLayout>
+
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+
+
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginTop="20dp"
+        android:backgroundTint="@color/colorWhite"
+        app:cardCornerRadius="40dp"
+        app:cardElevation="25dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/toolbar"
+            android:layout_marginHorizontal="25dp"
+            android:background="@color/cardview_light_background"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginRight="5dp"
+                android:fontFamily="sans-serif-condensed-light"
+                android:text="Total Drivers"
+
+                android:textColor="@color/colorredredall"
+                android:textSize="20dp"
+                android:textStyle="bold">
+
+            </TextView>
+
+
+            <EditText
+                android:id="@+id/et_totaldriver"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right"
+                android:layout_marginLeft="5dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginRight="5dp"
+                android:layout_marginBottom="10dp"
+                android:backgroundTint="@color/colorredredall"
+
+                android:enabled="false"
+                android:focusable="false"
+                android:fontFamily="sans-serif-condensed-light"
+                android:gravity="right"
+                android:textColor="@color/colorBlack"
+                android:textSize="20dp"
+                android:textStyle="normal">
+
+            </EditText>
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginTop="20dp"
+        android:backgroundTint="@color/colorWhite"
+        app:cardCornerRadius="40dp"
+        app:cardElevation="25dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/toolbar"
+            android:layout_marginHorizontal="25dp"
+            android:background="@color/cardview_light_background"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="5dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginRight="5dp"
+                android:fontFamily="sans-serif-condensed-light"
+                android:text="Current Month"
+
+                android:textColor="@color/colorredredall"
+                android:textSize="20dp"
+                android:textStyle="bold">
+
+            </TextView>
+
+
+            <EditText
+                android:id="@+id/et_currentmonth"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right"
+                android:layout_marginLeft="5dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginRight="5dp"
+                android:layout_marginBottom="10dp"
+                android:backgroundTint="@color/colorredredall"
+                android:enabled="false"
+                android:focusable="false"
+                android:fontFamily="sans-serif-condensed-light"
+                android:gravity="right"
+                android:textColor="@color/colorBlack"
+                android:textSize="20dp"
+                android:textStyle="normal">
+
+            </EditText>
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+
+    <ProgressBar
+        android:id="@+id/Progress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="5dp"
+        android:progressBackgroundTint="@color/colorWhite"
+        android:visibility="gone" />
+
+
+</LinearLayout>

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+
+    tools:showIn="navigation_view">
+    <group android:checkableBehavior="single">
+        <item
+            android:checked="true"
+            android:id="@+id/nav_userprofile"
+            android:title="User Profile">
+        </item>
+
+        <item
+            android:checked="true"
+            android:id="@+id/nav_insertdriver"
+            android:iconTint="@color/colorWhite"
+            android:icon="@drawable/ic_baseline_arrow_back_24"
+            android:title="Insert Driver">
+        </item>
+
+        <item
+            android:checked="true"
+            android:id="@+id/nav_totaldriverReport"
+            android:iconTint="@color/colorWhite"
+
+            android:title="Total drivers Report">
+        </item>
+        <item
+            android:checked="true"
+            android:id="@+id/nav_DriversMonthlyreport"
+            android:iconTint="@color/colorWhite"
+
+            android:title="Drivers Monthly Report">
+        </item>
+        <item
+            android:checked="true"
+            android:id="@+id/nav_logout"
+            android:iconTint="@color/colorWhite"
+
+            android:title="Log Out">
+        </item>
+
+    </group>
+
+
+
+
+
+</menu>

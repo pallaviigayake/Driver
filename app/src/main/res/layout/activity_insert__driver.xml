@@ -1,0 +1,1609 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorredredall"
+    android:orientation="vertical"
+    tools:context=".Insert_Driver">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <androidx.appcompat.widget.Toolbar
+                android:id="@+id/toolbar_Login"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="0dp"
+                android:background="@color/colorredredall"
+                android:minHeight="?attr/actionBarSize"
+                android:theme="?attr/actionBarTheme">
+
+                <ImageView
+                    android:id="@+id/iv_insertdriver"
+                    android:layout_width="30dp"
+                    android:layout_height="50dp"
+                    android:tint="@color/colorWhite"
+                    app:srcCompat="@drawable/ic_baseline_arrow_back_24" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:gravity="center"
+                    android:text="Insert Driver"
+                    android:textColor="@color/colorWhite"
+                    android:textSize="20sp"
+                    android:textStyle="bold">
+
+                </TextView>
+            </androidx.appcompat.widget.Toolbar>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+
+            <androidx.core.widget.NestedScrollView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:fillViewport="true">
+
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@color/colorWhitetransparent"
+                    android:orientation="vertical">
+
+                    <androidx.cardview.widget.CardView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="20dp"
+                        android:layout_marginTop="10dp"
+                        android:backgroundTint="@color/colorWhite"
+                        app:cardCornerRadius="5dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@+id/txt_skip"
+
+                            android:orientation="vertical">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="40dp"
+                                android:background="@color/colorWhite">
+
+                                <TextView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="center"
+                                    android:gravity="center"
+
+                                    android:text="Personal Information"
+                                    android:textColor="@color/colorredredall"
+                                    android:textStyle="bold">
+
+                                </TextView>
+
+
+                            </LinearLayout>
+
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginHorizontal="20dp"
+                                android:orientation="vertical"
+                                android:weightSum="2">
+
+
+                                <de.hdodenhof.circleimageview.CircleImageView
+                                    android:id="@+id/img_profile"
+                                    android:layout_width="90dp"
+                                    android:layout_height="90dp"
+                                    android:layout_gravity="center"
+                                    android:layout_marginHorizontal="20dp"
+                                    android:layout_marginVertical="10dp"
+                                    android:layout_marginTop="20dp"
+                                    android:layout_weight="0.10"
+                                    android:src="@drawable/user_profile"></de.hdodenhof.circleimageview.CircleImageView>
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="center"
+                                    android:layout_weight="1.90"
+                                    android:text="Upload Driver Picture"
+                                    android:textColor="@color/colorredredall"
+                                    android:textSize="15sp"></TextView>
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginHorizontal="20dp"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:id="@+id/txt_fname"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginVertical="2dp"
+                                    android:text="First Name"
+                                    android:textColor="@color/colorredredall"
+                                    android:textSize="15sp" />
+
+                                <EditText
+                                    android:id="@+id/etFname"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="5dp"
+                                    android:background="@drawable/line"
+                                    android:inputType="textCapWords"
+
+                                    android:textColor="@color/colorDrakGray"
+                                    android:textSize="15sp" />
+
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginHorizontal="20dp"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:id="@+id/txt_fnamse"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginVertical="5dp"
+                                    android:text="Phone No."
+                                    android:textColor="@color/colorredredall"
+                                    android:textSize="15sp" />
+
+                                <EditText
+                                    android:id="@+id/etphone1"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="5dp"
+                                    android:background="@drawable/line"
+                                    android:inputType="number"
+                                    android:maxLength="10"
+
+                                    android:textColor="@color/colorDrakGray"
+                                    android:textSize="15sp" />
+
+
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginHorizontal="20dp"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:id="@+id/txt_fnaemse"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginVertical="5dp"
+                                    android:text="Alternate Phone No."
+                                    android:textColor="@color/colorredredall"
+                                    android:textSize="15sp" />
+
+                                <EditText
+                                    android:id="@+id/etphone2"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="5dp"
+                                    android:background="@drawable/line"
+                                    android:inputType="number"
+                                    android:maxLength="10"
+
+                                    android:textColor="@color/colorDrakGray"
+                                    android:textSize="15sp" />
+
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginHorizontal="20dp"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:id="@+id/txt_fnaxsxsmse"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginVertical="5dp"
+                                    android:text="Educational Qualification"
+                                    android:textColor="@color/colorredredall"
+                                    android:textSize="15sp" />
+
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="40dp"
+                                    android:layout_marginTop="1dp"
+                                    android:background="@drawable/line"
+                                    android:orientation="vertical">
+
+                                    <Spinner
+                                        android:id="@+id/spinner_personal_Education"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="1"
+
+                                        android:backgroundTint="@color/colorredforget" />
+
+                                </LinearLayout>
+
+
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginHorizontal="20dp"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:id="@+id/txt_fnaxsssmse"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginVertical="5dp"
+                                    android:text="Total Work Experience"
+                                    android:textColor="@color/colorredredall"
+                                    android:textSize="15sp" />
+
+                                <EditText
+                                    android:id="@+id/etTotalworkexp"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="5dp"
+                                    android:layout_marginBottom="10dp"
+                                    android:background="@drawable/line"
+                                    android:inputType="number"
+                                    android:maxLength="2"
+
+                                    android:textColor="@color/colorDrakGray"
+                                    android:textSize="15sp" />
+
+                            </LinearLayout>
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginHorizontal="20dp"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:id="@+id/txt_fnaxscwmse"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginVertical="5dp"
+                                    android:text="Salary Expectation Per Month"
+                                    android:textColor="@color/colorredredall"
+                                    android:textSize="15sp" />
+
+
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="40dp"
+                                    android:layout_marginTop="1dp"
+                                    android:background="@drawable/line"
+                                    android:orientation="vertical">
+
+
+
+                                    <TextView
+                                        android:id="@+id/tvSalary"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:background="@color/colorDrakGray"
+                                        android:padding="5dp"
+                                        android:text="Select city"
+                                        android:visibility="gone" />
+
+                                    <com.toptoche.searchablespinnerlibrary.SearchableSpinner
+                                        android:id="@+id/spinner_salary"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="1"
+                                        android:backgroundTint="@color/colorredforget"
+                                        android:visibility="visible" />
+
+                                </LinearLayout>
+
+                            </LinearLayout>
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginHorizontal="20dp"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:id="@+id/txt_fnaxsmse"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginVertical="5dp"
+                                    android:text="Address"
+                                    android:textColor="@color/colorredredall"
+                                    android:textSize="15sp" />
+
+                                <EditText
+                                    android:id="@+id/etaddress"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="5dp"
+                                    android:background="@drawable/line"
+                                    android:inputType="text"
+
+                                    android:textColor="@color/colorDrakGray"
+                                    android:textSize="15sp" />
+
+                            </LinearLayout>
+
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginHorizontal="20dp"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:id="@+id/txt_fnaxsmse"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginVertical="5dp"
+                                    android:text="City"
+                                    android:textColor="@color/colorredredall"
+                                    android:textSize="15sp" />
+
+
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="40dp"
+                                    android:layout_marginTop="1dp"
+                                    android:background="@drawable/line"
+                                    android:orientation="vertical">
+
+
+
+                                    <TextView
+                                        android:id="@+id/tvSelectCity"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:background="@color/colorDrakGray"
+                                        android:padding="5dp"
+                                        android:text="Select city"
+                                        android:visibility="gone" />
+
+                                    <com.toptoche.searchablespinnerlibrary.SearchableSpinner
+                                        android:id="@+id/spinner_personal_city"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="1"
+                                        android:backgroundTint="@color/colorredforget"
+                                        android:visibility="visible" />
+
+                                </LinearLayout>
+
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginHorizontal="20dp"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:id="@+id/txt_fnaxsmse"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginVertical="5dp"
+                                    android:text="District"
+                                    android:textColor="@color/colorredredall"
+                                    android:textSize="15sp" />
+
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="40dp"
+                                    android:layout_marginTop="1dp"
+                                    android:background="@drawable/line"
+                                    android:orientation="vertical">
+
+                                    <com.toptoche.searchablespinnerlibrary.SearchableSpinner
+                                        android:id="@+id/spinner_personal_District"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="1"
+
+                                        android:backgroundTint="@color/colorredforget" />
+
+                                </LinearLayout>
+
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+
+                                android:layout_marginHorizontal="20dp"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:id="@+id/txt_fnaxsmse"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginVertical="5dp"
+                                    android:text="State"
+                                    android:textColor="@color/colorredredall"
+                                    android:textSize="15sp" />
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="40dp"
+                                    android:layout_marginTop="1dp"
+                                    android:layout_marginBottom="10dp"
+                                    android:background="@drawable/line"
+                                    android:orientation="vertical">
+
+                                    <com.toptoche.searchablespinnerlibrary.SearchableSpinner
+                                        android:id="@+id/spinner_personal_statee"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+
+                                        android:layout_weight="1"
+                                        android:backgroundTint="@color/colorredforget" />
+
+                                </LinearLayout>
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginHorizontal="20dp"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:id="@+id/txt_fnaxsmse"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginVertical="5dp"
+                                    android:text="Street"
+                                    android:textColor="@color/colorredredall"
+                                    android:textSize="15sp" />
+
+                                <EditText
+                                    android:id="@+id/etstreet"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="5dp"
+                                    android:background="@drawable/line"
+                                    android:inputType="textCapWords"
+
+                                    android:textColor="@color/colorDrakGray"
+                                    android:textSize="15sp" />
+
+
+                            </LinearLayout>
+
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginHorizontal="20dp"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:id="@+id/txt_fnaxsxsmse"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginVertical="5dp"
+                                    android:text="Types of Vehicle driven"
+                                    android:textColor="@color/colorredredall"
+                                    android:textSize="15sp" />
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="horizontal"
+
+                                    android:weightSum="3">
+
+                                    <CheckBox
+                                        android:id="@+id/checkbox_tata_ace"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="1"
+                                        android:buttonTint="@color/colorredredall"
+                                        android:text="Tata Ace"
+                                        android:visibility="visible"
+                                        android:textColor="@color/colorDrakGray"
+                                        android:textColorHint="@color/colorDrakGray"
+                                        android:textSize="12sp">
+
+                                    </CheckBox>
+
+                                    <CheckBox
+                                        android:id="@+id/checkbox_mahindra"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="1"
+                                        android:visibility="visible"
+                                        android:buttonTint="@color/colorredredall"
+                                        android:text="Mahindra"
+                                        android:textColor="@color/colorDrakGray"
+                                        android:textSize="12sp">
+
+                                    </CheckBox>
+
+                                    <CheckBox
+                                        android:id="@+id/checkbox_407"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="1"
+                                        android:buttonTint="@color/colorredredall"
+                                        android:text="407"
+                                        android:visibility="visible"
+                                        android:textColor="@color/colorDrakGray"
+                                        android:textSize="12sp">
+
+                                    </CheckBox>
+                                </LinearLayout>
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="horizontal"
+                                    android:weightSum="3">
+
+                                    <CheckBox
+                                        android:id="@+id/checkbox_1109"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="1"
+                                        android:buttonTint="@color/colorredredall"
+                                        android:text="1109"
+                                        android:visibility="visible"
+                                        android:textColor="@color/colorDrakGray"
+                                        android:textColorHint="@color/colorDrakGray"
+                                        android:textSize="12sp">
+
+                                    </CheckBox>
+
+                                    <CheckBox
+                                        android:id="@+id/checkbox_10tyre"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="1"
+                                        android:visibility="visible"
+                                        android:buttonTint="@color/colorredredall"
+                                        android:text="10tyre"
+                                        android:textColor="@color/colorDrakGray"
+                                        android:textSize="12sp">
+
+                                    </CheckBox>
+
+                                    <CheckBox
+                                        android:id="@+id/checkbox_12tyre"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="1"
+                                        android:visibility="visible"
+                                        android:buttonTint="@color/colorredredall"
+                                        android:text="12tyre"
+                                        android:textColor="@color/colorDrakGray"
+                                        android:textSize="12sp">
+
+                                    </CheckBox>
+                                </LinearLayout>
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="horizontal"
+                                    android:weightSum="3">
+
+                                    <CheckBox
+                                        android:id="@+id/checkbox_t14tyre"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="1"
+                                        android:buttonTint="@color/colorredredall"
+                                        android:text="14tyre"
+                                        android:visibility="visible"
+                                        android:textColor="@color/colorDrakGray"
+                                        android:textColorHint="@color/colorDrakGray"
+                                        android:textSize="12sp">
+
+                                    </CheckBox>
+
+                                    <CheckBox
+                                        android:id="@+id/checkbox_32feetsxl"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="1"
+                                        android:buttonTint="@color/colorredredall"
+                                        android:text="32Feet-Sxl"
+                                        android:visibility="visible"
+                                        android:textColor="@color/colorDrakGray"
+                                        android:textSize="12sp">
+
+                                    </CheckBox>
+
+                                    <CheckBox
+                                        android:id="@+id/checkbox_32feetmxl"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="1"
+                                        android:visibility="visible"
+                                        android:buttonTint="@color/colorredredall"
+                                        android:text="32Feet-Mxl"
+                                        android:textColor="@color/colorDrakGray"
+                                        android:textSize="12sp">
+
+                                    </CheckBox>
+                                </LinearLayout>
+
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="horizontal"
+                                    android:weightSum="3">
+
+                                    <CheckBox
+                                        android:id="@+id/checkbox_trailer"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="1"
+                                        android:visibility="visible"
+                                        android:buttonTint="@color/colorredredall"
+                                        android:text="Trailer"
+                                        android:textColor="@color/colorDrakGray"
+                                        android:textColorHint="@color/colorDrakGray"
+                                        android:textSize="12sp">
+
+                                    </CheckBox>
+
+                                    <CheckBox
+                                        android:id="@+id/checkbox_tanker"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="1"
+                                        android:buttonTint="@color/colorredredall"
+                                        android:text="Tanker"
+                                        android:visibility="visible"
+                                        android:textColor="@color/colorDrakGray"
+                                        android:textColorHint="@color/colorDrakGray"
+                                        android:textSize="12sp"
+                                       ></CheckBox>
+
+                                    <LinearLayout
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+
+                                        android:layout_weight="1"></LinearLayout>
+
+
+                                </LinearLayout>
+
+
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginHorizontal="20dp"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:id="@+id/txt_fnaxsmse"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginVertical="5dp"
+                                    android:text="Routes Driven"
+                                    android:textColor="@color/colorredredall"
+                                    android:textSize="15sp" />
+
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="40dp"
+                                    android:layout_marginTop="1dp"
+                                    android:layout_marginBottom="10dp"
+                                    android:background="@drawable/line"
+                                    android:orientation="vertical">
+
+                                    <Spinner
+                                        android:id="@+id/spinner_Routes_Driven"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+
+                                        android:layout_weight="1"
+                                        android:backgroundTint="@color/colorredforget" />
+
+                                </LinearLayout>
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:id="@+id/li_spinner_localcity"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginHorizontal="20dp"
+                                android:orientation="vertical"
+                                android:visibility="gone">
+
+                                <TextView
+                                    android:id="@+id/txt_fnaxsxamse"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginVertical="5dp"
+                                    android:text="Local City"
+                                    android:textColor="@color/colorredredall"
+                                    android:textSize="15sp" />
+
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="40dp"
+                                    android:layout_marginTop="1dp"
+
+                                    android:layout_marginBottom="10dp"
+                                    android:background="@drawable/line"
+                                    android:orientation="vertical">
+
+                                    <com.toptoche.searchablespinnerlibrary.SearchableSpinner
+                                        android:id="@+id/spinner_localcity"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="1"
+                                        android:backgroundTint="@color/colorredforget" />
+
+                                </LinearLayout>
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:id="@+id/li_spinner_routes_driven_from"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginHorizontal="20dp"
+                                android:orientation="vertical"
+                                android:visibility="gone">
+
+                                <TextView
+                                    android:id="@+id/txt_fnaxsmse"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginVertical="5dp"
+                                    android:text="Routes Driven From"
+                                    android:textColor="@color/colorredredall"
+                                    android:textSize="15sp" />
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="40dp"
+                                    android:layout_marginTop="1dp"
+                                    android:background="@drawable/line"
+                                    android:orientation="vertical">
+
+                                    <com.toptoche.searchablespinnerlibrary.SearchableSpinner
+                                        android:id="@+id/spinner_personal_driven_from"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="1"
+
+                                        android:backgroundTint="@color/colorredforget" />
+
+                                </LinearLayout>
+
+
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:id="@+id/li_spinner_routes_driven_to"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginHorizontal="20dp"
+                                android:orientation="vertical"
+                                android:visibility="gone">
+
+                                <TextView
+                                    android:id="@+id/txt_fsnaxsmse"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginVertical="5dp"
+                                    android:text="Routes Driven To"
+                                    android:textColor="@color/colorredredall"
+                                    android:textSize="15sp" />
+
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="40dp"
+                                    android:layout_marginTop="1dp"
+                                    android:layout_marginBottom="10dp"
+                                    android:background="@drawable/line"
+                                    android:orientation="vertical">
+
+                                    <com.toptoche.searchablespinnerlibrary.SearchableSpinner
+                                        android:id="@+id/spinner_personal_driven_to"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+
+                                        android:layout_weight="1"
+                                        android:backgroundTint="@color/colorredforget" />
+
+                                </LinearLayout>
+
+                            </LinearLayout>
+
+                        </LinearLayout>
+                    </androidx.cardview.widget.CardView>
+
+                    <androidx.cardview.widget.CardView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="20dp"
+                        android:layout_marginTop="10dp"
+                        android:backgroundTint="@color/colorWhite"
+                        app:cardCornerRadius="5dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@+id/txt_skip"
+
+                            android:orientation="vertical">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="40dp"
+                                android:background="@color/colorWhite">
+
+                                <TextView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="center"
+                                    android:gravity="center"
+                                    android:text="Document Information"
+                                    android:textColor="@color/colorredredall"
+                                    android:textStyle="bold">
+
+                                </TextView>
+
+
+                            </LinearLayout>
+
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:layout_marginHorizontal="20dp"
+                                android:layout_weight="1"
+                                android:gravity="center"
+                                android:orientation="vertical">
+
+
+                                <androidx.cardview.widget.CardView
+                                    android:layout_width="100dp"
+                                    android:layout_height="100dp"
+                                    android:layout_marginTop="5dp"
+                                    app:cardBackgroundColor="@color/colorWhite"
+                                    app:cardCornerRadius="5dp">
+
+                                    <ImageView
+                                        android:id="@+id/img_licenseimg"
+                                        android:layout_width="80dp"
+                                        android:layout_height="70dp"
+                                        android:layout_centerInParent="true"
+                                        android:layout_margin="10dp"
+                                        android:background="@drawable/driver_licen1"
+
+                                        android:scaleType="fitXY" />
+                                </androidx.cardview.widget.CardView>
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="center"
+                                    android:layout_weight="1.90"
+
+                                    android:gravity="center"
+                                    android:text="License Image"
+                                    android:textColor="@color/colorredredall"
+                                    android:textSize="15sp">
+
+                                </TextView>
+
+                            </LinearLayout>
+
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginHorizontal="20dp"
+                                android:orientation="vertical"
+                                android:visibility="gone">
+
+                                <TextView
+                                    android:id="@+id/txt_cwfname"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginVertical="5dp"
+                                    android:text="DL Number"
+                                    android:textColor="@color/colorredredall"
+                                    android:textSize="15sp" />
+
+                                <EditText
+                                    android:id="@+id/etdlnumber"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="5dp"
+                                    android:background="@drawable/line"
+                                    android:inputType="textCapWords"
+
+                                    android:textColor="@color/colorDrakGray"
+                                    android:textSize="15sp" />
+
+
+                            </LinearLayout>
+
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginHorizontal="20dp"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:id="@+id/txt_fnamse"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginVertical="5dp"
+                                    android:text="Driving License No"
+                                    android:textColor="@color/colorredredall"
+                                    android:textSize="15sp" />
+
+
+                                <EditText
+                                    android:id="@+id/etdriving_license_no"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="5dp"
+                                    android:background="@drawable/line"
+                                    android:inputType="textCapWords"
+
+                                    android:textColor="@color/colorDrakGray"
+                                    android:textSize="15sp" />
+
+
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginHorizontal="20dp"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:id="@+id/txt_fnaemse"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginVertical="5dp"
+                                    android:inputType="text"
+                                    android:text="License Expiry Date"
+                                    android:textColor="@color/colorredredall"
+                                    android:textSize="15sp" />
+
+
+                                <TextView
+                                    android:id="@+id/tv_license_expiry_date"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="10dp"
+                                    android:background="@drawable/line"
+                                    android:inputType="textCapWords"
+                                    android:padding="5dp"
+
+                                    android:textColor="@color/colorredredall"
+                                    android:textSize="15sp" />
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginHorizontal="20dp"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:id="@+id/txt_fnaxsmse"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginVertical="5dp"
+                                    android:text="License Type"
+                                    android:textColor="@color/colorredredall"
+                                    android:textSize="15sp" />
+
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="40dp"
+                                    android:layout_marginTop="1dp"
+                                    android:layout_marginBottom="10dp"
+                                    android:background="@drawable/line"
+                                    android:orientation="vertical">
+
+                                    <Spinner
+                                        android:id="@+id/spinner_license_type"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+
+                                        android:layout_weight="1"
+                                        android:backgroundTint="@color/colorredforget" />
+
+                                </LinearLayout>
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginHorizontal="20dp"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:id="@+id/txt_fnaxsxsmse"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginVertical="5dp"
+                                    android:text="Cases on Driving license"
+                                    android:textColor="@color/colorredredall"
+                                    android:textSize="15sp" />
+
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="40dp"
+                                    android:layout_marginTop="1dp"
+                                    android:layout_marginBottom="10dp"
+                                    android:background="@drawable/line"
+                                    android:orientation="vertical">
+
+                                    <Spinner
+                                        android:id="@+id/spinner_casesonDrvinglicense"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+
+                                        android:layout_weight="1"
+                                        android:backgroundTint="@color/colorredforget" />
+
+                                </LinearLayout>
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginHorizontal="20dp"
+                                android:layout_marginBottom="10dp"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:id="@+id/txt_cwfname"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginVertical="5dp"
+                                    android:text="Select Document(Either Adhar Card/Pan Card)"
+                                    android:textColor="@color/colorredredall"
+                                    android:textSize="15sp" />
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="40dp"
+                                    android:layout_marginTop="1dp"
+                                    android:background="@drawable/line"
+                                    android:orientation="vertical">
+
+                                    <Spinner
+                                        android:id="@+id/spinner_doucument_adhar_pan"
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="1"
+
+                                        android:backgroundTint="@color/colorredforget" />
+
+                                </LinearLayout>
+
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:id="@+id/docs_All_adhar"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="5dp"
+                                android:orientation="horizontal"
+                                android:visibility="gone"
+                                android:weightSum="2">
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginHorizontal="20dp"
+                                    android:layout_weight="1"
+                                    android:orientation="vertical"
+                                    android:weightSum="2">
+
+
+                                    <androidx.cardview.widget.CardView
+                                        android:layout_width="100dp"
+                                        android:layout_height="100dp"
+                                        android:layout_marginTop="5dp"
+                                        app:cardBackgroundColor="@color/colorWhite"
+                                        app:cardCornerRadius="5dp">
+
+                                        <ImageView
+                                            android:id="@+id/img_adhar_front"
+                                            android:layout_width="80dp"
+                                            android:layout_height="70dp"
+                                            android:layout_centerInParent="true"
+                                            android:layout_margin="10dp"
+                                            android:background="@drawable/adar_pan"
+
+                                            android:scaleType="fitXY" />
+                                    </androidx.cardview.widget.CardView>
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_gravity="left"
+
+                                        android:layout_weight="1.90"
+                                        android:text="Adhar Front Image"
+                                        android:textColor="@color/colorredredall"
+                                        android:textSize="15sp">
+
+                                    </TextView>
+
+                                </LinearLayout>
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginHorizontal="20dp"
+                                    android:layout_weight="1"
+
+                                    android:orientation="vertical"
+                                    android:weightSum="2">
+
+                                    <androidx.cardview.widget.CardView
+                                        android:layout_width="100dp"
+                                        android:layout_height="100dp"
+                                        android:layout_marginLeft="20dp"
+                                        android:layout_marginTop="5dp"
+                                        app:cardBackgroundColor="@color/colorWhite"
+                                        app:cardCornerRadius="5dp">
+
+                                        <ImageView
+                                            android:id="@+id/img_adhar_back"
+                                            android:layout_width="80dp"
+                                            android:layout_height="70dp"
+                                            android:layout_centerInParent="true"
+                                            android:layout_margin="10dp"
+                                            android:background="@drawable/adar_pan"
+
+                                            android:scaleType="fitXY" />
+                                    </androidx.cardview.widget.CardView>
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_gravity="center"
+
+                                        android:layout_weight="1.90"
+                                        android:text="Aadhar back Image"
+                                        android:textColor="@color/colorredredall"
+                                        android:textSize="15sp">
+
+                                    </TextView>
+
+
+                                </LinearLayout>
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:id="@+id/docs_All_pan"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:layout_marginHorizontal="20dp"
+                                android:layout_weight="1"
+                                android:gravity="center"
+                                android:orientation="vertical">
+
+
+                                <androidx.cardview.widget.CardView
+                                    android:layout_width="100dp"
+                                    android:layout_height="100dp"
+                                    android:layout_marginTop="5dp"
+                                    app:cardBackgroundColor="@color/colorWhite"
+                                    app:cardCornerRadius="5dp">
+
+                                    <ImageView
+                                        android:id="@+id/img_pan_card"
+                                        android:layout_width="80dp"
+                                        android:layout_height="70dp"
+                                        android:layout_centerInParent="true"
+                                        android:layout_margin="10dp"
+                                        android:background="@drawable/adar_pan"
+
+                                        android:scaleType="fitXY" />
+                                </androidx.cardview.widget.CardView>
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="center"
+                                    android:layout_weight="1.90"
+
+                                    android:gravity="center"
+                                    android:text="Pan Card Image"
+                                    android:textColor="@color/colorredredall"
+                                    android:textSize="15sp">
+
+                                </TextView>
+
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginHorizontal="20dp"
+                                android:layout_marginTop="10dp"
+                                android:layout_marginBottom="20dp"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:id="@+id/tv_adhar_pan"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginVertical="5dp"
+                                    android:layout_marginBottom="20dp"
+                                    android:text="Adharcard No"
+                                    android:textColor="@color/colorredredall"
+                                    android:textSize="15sp"
+                                    android:visibility="gone" />
+
+                                <TextView
+                                    android:id="@+id/tv_pan"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginVertical="5dp"
+                                    android:layout_marginBottom="20dp"
+                                    android:text="Pancard No"
+                                    android:textColor="@color/colorredredall"
+                                    android:textSize="15sp"
+                                    android:visibility="visible" />
+
+
+                                <EditText
+                                    android:id="@+id/et_adhar"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="5dp"
+                                    android:background="@drawable/line"
+                                    android:inputType="textCapWords"
+android:visibility="gone"
+                                    android:textColor="@color/colorDrakGray"
+                                    android:textSize="15sp" />
+
+                                <EditText
+                                    android:id="@+id/et_pan"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="5dp"
+                                    android:background="@drawable/line"
+                                    android:inputType="textCapWords"
+                                    android:visibility="gone"
+                                    android:textColor="@color/colorDrakGray"
+                                    android:textSize="15sp" />
+                            </LinearLayout>
+
+
+                        </LinearLayout>
+                    </androidx.cardview.widget.CardView>
+
+
+                    <androidx.cardview.widget.CardView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="20dp"
+                        android:layout_marginTop="10dp"
+                        android:backgroundTint="@color/colorWhite"
+                        app:cardCornerRadius="5dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@+id/txt_skip"
+
+                            android:orientation="vertical">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="30dp"
+                                android:background="@color/colorWhite">
+
+                                <TextView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="center"
+                                    android:gravity="center"
+                                    android:text="Reference"
+                                    android:textColor="@color/colorredredall"
+                                    android:textStyle="bold">
+
+                                </TextView>
+
+
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginHorizontal="20dp"
+                                android:orientation="vertical"
+                                android:visibility="visible"
+                                android:weightSum="2">
+
+
+                                <LinearLayout
+                                    android:id="@+id/docs_All_adhabhr"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="5dp"
+                                    android:orientation="horizontal"
+                                    android:visibility="visible"
+                                    android:weightSum="2">
+
+                                    <LinearLayout
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginHorizontal="20dp"
+                                        android:layout_weight="1"
+                                        android:orientation="vertical"
+                                        android:weightSum="2">
+
+
+                                        <androidx.cardview.widget.CardView
+                                            android:layout_width="100dp"
+                                            android:layout_height="100dp"
+                                            android:layout_marginTop="5dp"
+                                            app:cardBackgroundColor="@color/colorWhite"
+                                            app:cardCornerRadius="5dp">
+
+                                            <ImageView
+                                                android:id="@+id/img_ref_address_proof1"
+                                                android:layout_width="80dp"
+                                                android:layout_height="70dp"
+                                                android:layout_centerInParent="true"
+                                                android:layout_margin="10dp"
+                                                android:background="@drawable/ref_address_prof"
+
+                                                android:scaleType="fitXY" />
+                                        </androidx.cardview.widget.CardView>
+
+
+                                    </LinearLayout>
+
+                                    <LinearLayout
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginHorizontal="20dp"
+                                        android:layout_weight="1"
+
+                                        android:orientation="vertical"
+                                        android:weightSum="2">
+
+                                        <androidx.cardview.widget.CardView
+                                            android:layout_width="100dp"
+                                            android:layout_height="100dp"
+                                            android:layout_marginLeft="20dp"
+                                            android:layout_marginTop="5dp"
+                                            app:cardBackgroundColor="@color/colorWhite"
+                                            app:cardCornerRadius="5dp">
+
+                                            <ImageView
+                                                android:id="@+id/img_ref_address_proof2"
+                                                android:layout_width="80dp"
+                                                android:layout_height="70dp"
+                                                android:layout_centerInParent="true"
+                                                android:layout_margin="10dp"
+                                                android:background="@drawable/ref_address_prof"
+
+                                                android:scaleType="fitXY" />
+                                        </androidx.cardview.widget.CardView>
+
+
+                                    </LinearLayout>
+                                </LinearLayout>
+
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="center"
+                                    android:layout_weight="1.90"
+                                    android:text="Reference Address Proof"
+                                    android:textColor="@color/colorredredall"
+                                    android:textSize="15sp"></TextView>
+                            </LinearLayout>
+
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginHorizontal="20dp"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:id="@+id/txt_fname"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginVertical="5dp"
+                                    android:text="Reference Name"
+                                    android:textColor="@color/colorredredall"
+                                    android:textSize="15sp" />
+
+                                <EditText
+                                    android:id="@+id/et_ref_name"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="5dp"
+                                    android:background="@drawable/line"
+                                    android:inputType="textCapWords"
+
+                                    android:textColor="@color/colorDrakGray"
+
+                                    android:textSize="15sp" />
+
+
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginHorizontal="20dp"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:id="@+id/txt_fnamse"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginVertical="5dp"
+                                    android:text="Reference Address"
+                                    android:textColor="@color/colorredredall"
+                                    android:textSize="15sp" />
+
+
+                                <EditText
+                                    android:id="@+id/et_ref_address"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="5dp"
+                                    android:background="@drawable/line"
+                                    android:inputType="textCapWords"
+
+                                    android:textColor="@color/colorDrakGray"
+
+                                    android:textSize="15sp" />
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginHorizontal="20dp"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:id="@+id/txt_fnaemse"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginVertical="5dp"
+                                    android:text="Reference Contact No"
+                                    android:textColor="@color/colorredredall"
+                                    android:textSize="15sp" />
+
+
+                                <EditText
+                                    android:id="@+id/et_ref_contactno"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="5dp"
+                                    android:background="@drawable/line"
+                                    android:inputType="number"
+
+                                    android:maxLength="10"
+                                    android:textColor="@color/colorDrakGray"
+                                    android:textSize="15sp" />
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginHorizontal="20dp"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:id="@+id/txt_fnaxsmse"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginVertical="5dp"
+                                    android:text="Reference Relation"
+                                    android:textColor="@color/colorredredall"
+                                    android:textSize="15sp" />
+
+
+                                <EditText
+                                    android:id="@+id/et_ref_relation"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="5dp"
+                                    android:layout_marginBottom="10dp"
+                                    android:background="@drawable/line"
+                                    android:inputType="textCapWords"
+
+                                    android:paddingBottom="10dp"
+                                    android:textColor="@color/colorDrakGray"
+                                    android:textSize="15sp" />
+                            </LinearLayout>
+
+
+                        </LinearLayout>
+                    </androidx.cardview.widget.CardView>
+
+                    <Button
+                        android:id="@+id/btn_submit"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:layout_marginHorizontal="20dp"
+                        android:layout_marginTop="20dp"
+                        android:layout_marginBottom="15dp"
+                        android:background="@drawable/rounded_login"
+
+                        android:text="Submit"
+                        android:textAllCaps="false"
+                        android:textColor="@color/colorredredall"
+                        android:textStyle="bold">
+
+                    </Button>
+                </LinearLayout>
+
+
+            </androidx.core.widget.NestedScrollView>
+
+
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+</LinearLayout>

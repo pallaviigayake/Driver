@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Driver</string>
+    <string name="Username"><font size="15">Username</font></string>
+    <string name="navigation_drawer_open">navigation_drawer_open</string>
+    <string name="navigation_drawer_close">navigation_drawer_close</string>
+
+    <string name="runtime_permissions_txt">Runtime Permission Error</string>
+    <string name="register"><u>Register YourSelf Here</u></string>
+    <string name="internal_storage1">internal_storage</string>
+</resources>
