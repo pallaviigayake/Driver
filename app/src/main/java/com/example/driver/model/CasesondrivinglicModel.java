@@ -1,8 +1,9 @@
+
 package com.example.driver.model;
 
 public class CasesondrivinglicModel {
-String id;
-String Cases_On_Driving_License;
+    String id;
+    String Cases_On_Driving_License;
 
     public CasesondrivinglicModel(String id, String cases_On_Driving_License) {
         this.id = id;

@@ -11,13 +11,13 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.viewpager.widget.ViewPager;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -76,54 +76,32 @@ public class MainActivity extends AppCompatActivity {
         } catch (Exception e) {
             e.printStackTrace();
         }
-     init();
+        logout.setOnClickListener(new View.OnClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+            @Override
+            public void onClick(View view) {
+                showLogoutDialog();
+            }
+        });
+        li_insertdriver.setOnClickListener(view -> {
+            // li_insertdriver.setBackgroundResource(R.drawable.btn_red);
+
+            Intent intent = new Intent(MainActivity.this, Insert_Driver.class);
+            startActivityForResult(intent, 123);
+        });
+        li_updateprofile.setOnClickListener(view -> {
+
+            //li_updateprofile.setBackgroundResource(R.drawable.btn_red);
+            Intent intent = new Intent(MainActivity.this, UserProfile.class);
+            startActivity(intent);
+        });
+        rel_driverReport.setOnClickListener(view -> {
+            //rel_driverReport.setBackgroundDrawable(getResources().getDrawable(R.drawable.btn_red));
+            Intent intent = new Intent(MainActivity.this, Driver_Report.class);
+            startActivity(intent);
+        });
     }
-public void init(){
-    logout.setOnClickListener(new View.OnClickListener() {
 
-        @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-        @Override
-        public void onClick(View view) {
-            //showLogoutDialog();
-            showLogoutDialog();
-           /* AlertDialog.Builder alert = new AlertDialog.Builder(MainActivity.this);
-            alert.setMessage("Are you sure?")
-                    .setPositiveButton("Logout", new DialogInterface.OnClickListener()                 {
-
-                        public void onClick(DialogInterface dialog, int which) {
-
-                            logout(); // Last step. Logout function
-
-                        }
-                    }).setNegativeButton("Cancel", null);
-
-            AlertDialog alert1 = alert.create();
-            alert1.show();*/
-        }
-    });
-    li_insertdriver.setOnClickListener(view -> {
-        // li_insertdriver.setBackgroundResource(R.drawable.btn_red);
-        li_insertdriver.setBackgroundDrawable(getResources().getDrawable(R.drawable.btn_red));
-
-        Intent intent = new Intent(MainActivity.this, Insert_Driver.class);
-        startActivityForResult(intent, 123);
-    });
-    li_updateprofile.setOnClickListener(view -> {
-
-        //li_updateprofile.setBackgroundResource(R.drawable.btn_red);
-        li_updateprofile.setBackgroundDrawable(getResources().getDrawable(R.drawable.btn_red));
-
-        Intent intent = new Intent(MainActivity.this, UserProfile.class);
-        startActivity(intent);
-    });
-    rel_driverReport.setOnClickListener(view -> {
-        //rel_driverReport.setBackgroundDrawable(getResources().getDrawable(R.drawable.btn_red));
-        rel_driverReport.setBackgroundDrawable(getResources().getDrawable(R.drawable.btn_red));
-
-        Intent intent = new Intent(MainActivity.this, Driver_Report.class);
-        startActivity(intent);
-    });
-}
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -136,30 +114,34 @@ public void init(){
         }
     }
 
-
-
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     public void showLogoutDialog() {
 
-       AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
         LayoutInflater inflater = getLayoutInflater();
         View loyaltyView = inflater.inflate(R.layout.alert_exit_ui, null);
 
         builder.setView(loyaltyView);
 
         TextView textView = (TextView) loyaltyView.findViewById(R.id.alert_textview);
+        textView.setGravity(Gravity.CENTER);
         textView.setText("Sure You want to Logout ?");
+
         RelativeLayout OkayButton = loyaltyView.findViewById(R.id.btn_positive_alert);
         RelativeLayout cancleButton = loyaltyView.findViewById(R.id.btn_negative_alert);
-
         dialogLoyalty = builder.create();
         OkayButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-              //  sessionManager.logoutuser();
+
+                sessionManager.logout();
                 Intent intent = new Intent(getApplicationContext(), Login.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                intent.addCategory(Intent.CATEGORY_HOME);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+
                 startActivity(intent);
-                finish();
+
+//                finish();
 
             }
         });
@@ -167,7 +149,6 @@ public void init(){
         cancleButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
                 dialogLoyalty.dismiss();
             }
         });
@@ -176,8 +157,4 @@ public void init(){
         dialogLoyalty.show();
         Objects.requireNonNull(dialogLoyalty.getWindow()).setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
     }
-   private void logout() {
-       startActivity(new Intent(this, Login.class));
-       finish();
-   }
 }

@@ -147,6 +147,8 @@ public class UserProfile extends AppCompatActivity {
                     var = 1;
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                         checkPermission1();
+                    }else {
+                        selectImage();
                     }
 
                 }

@@ -1,3 +1,5 @@
+
+
 package com.example.driver.service;
 
 import android.app.AlarmManager;
@@ -73,5 +75,3 @@ public class AppController extends Application {
         Log.e("Application", "Application terminated.");
     }
 }
-
-

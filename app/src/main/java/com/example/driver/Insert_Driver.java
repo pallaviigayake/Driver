@@ -1,15 +1,11 @@
 package com.example.driver;
 
-import androidx.annotation.RequiresApi;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -19,12 +15,17 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.text.Editable;
+import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.util.Base64;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,6 +35,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -42,6 +44,11 @@ import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.DefaultRetryPolicy;
@@ -61,6 +68,7 @@ import com.example.driver.model.CityModel;
 import com.example.driver.model.Datum;
 import com.example.driver.model.DistrictModel;
 import com.example.driver.model.DrivenToModel;
+import com.example.driver.model.DrivenfromModel;
 import com.example.driver.model.LicensetypeModel;
 import com.example.driver.model.LocalCityModel;
 import com.example.driver.model.QualificationModel;
@@ -76,6 +84,7 @@ import com.kaopiz.kprogresshud.KProgressHUD;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.xmlpull.v1.sax2.Driver;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -83,22 +92,24 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+import okhttp3.FormBody;
+import okhttp3.OkHttpClient;
+import okhttp3.RequestBody;
 
-public class Insert_Driver extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
+public class Insert_Driver extends AppCompatActivity implements AdapterView.OnItemSelectedListener, CompoundButton.OnCheckedChangeListener {
     @Override
     public void onBackPressed() {
 /*
@@ -108,6 +119,17 @@ public class Insert_Driver extends AppCompatActivity implements AdapterView.OnIt
 
 
     }
+
+    private TextView tvDisplayDate;
+
+    private Button btnChangeDate;
+
+    private int myear;
+    private int mmonth;
+    private int mday;
+
+    static final int DATE_DIALOG_ID = 999;
+
     KProgressHUD dialog;
     TextView tv_license_expiry_date;
     ImageView iv_insertdriver;
@@ -152,6 +174,8 @@ public class Insert_Driver extends AppCompatActivity implements AdapterView.OnIt
 
     private ArrayList<String> Driventocity = new ArrayList<String>();
     private ArrayList<String> Driventoid = new ArrayList<String>();
+    private ArrayList<String> Drivenfromcity = new ArrayList<String>();
+    private ArrayList<String> Drivenfromid = new ArrayList<String>();
 
     String role = "";
     String str_title, str_location, str_startdate, str_enddate, str_links, str_tags,
@@ -191,7 +215,9 @@ public class Insert_Driver extends AppCompatActivity implements AdapterView.OnIt
     ArrayList<StateModel> stateModels;
     ArrayList<LocalCityModel> localCityModels;
     ArrayList<DistrictModel> districtModels;
-    ArrayList<DrivenToModel> drivenToModels;
+    ArrayList<LocalCityModel> drivenToModels;
+    ArrayList<LocalCityModel> drivenfromModel;
+    // ArrayList<Driven> districtModels = new ArrayList<>();
     String city;
     // ArrayList arrayList_licensetype;
     ArrayList arrayListcasesonDrvinglicense;
@@ -207,24 +233,32 @@ public class Insert_Driver extends AppCompatActivity implements AdapterView.OnIt
     String Checkboxdata;
     TextView tv_adhar_pan, tv_pan;
     EditText etFname, etphone1;
-    EditText etphone2, etTotalworkexp, etaddress, etstreet, etdlnumber, et_pan,et_adhar_pan, etdriving_license_no, et_ref_name, et_ref_address, et_ref_contactno, et_ref_relation;
+    EditText etphone2, etTotalworkexp, etaddress, etstreet, etdlnumber, et_pan, et_adhar_pan, etdriving_license_no, et_ref_name, et_ref_address, et_ref_contactno, et_ref_relation;
     HashMap<String, String> hashMap;
     String id;
     String checkboxdisplay = "";
     String str_checkbox_tata_ace, str_checkbox_mahindra;
     ImageView img_pan_card, img_adhar_front, img_adhar_back;
-    EditText etlistcity;
+    EditText etlistcity,et_adhar;
     ArrayList<String> itmsssss = new ArrayList<>();
 
     Spinner spinner_Routes_Driven;
+    ArrayList<String> checkBoxArray;
 
+    boolean spinnerItem;
+
+TextView tv_insertdriver;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_insert__driver);
         //  li_allcheckbox=findViewById(R.id.li_allcheckbox);
-       // onBackPressed();
+        // onBackPressed();
+        initiateIds();
+        init();
+       // tv_insertdriver=findViewById(R.id.tv_insertdriver);
         arrayList_licensetype = new ArrayList<>();
+        checkBoxArray = new ArrayList<>();
         arrayList_casesondrivinglicense = new ArrayList<>();
         cityModelArrayList = new ArrayList<>();
         arrayList_salary = new ArrayList<>();
@@ -235,11 +269,12 @@ public class Insert_Driver extends AppCompatActivity implements AdapterView.OnIt
             hashMap = sessionManager.getUSerdetails();
             id = hashMap.get(SessionManager.userId);
         }
-        initiateIds();
-        init();
+
+
     }
 
     private void initiateIds() {
+
         dialog = KProgressHUD.create(Insert_Driver.this)
                 .setStyle(KProgressHUD.Style.SPIN_INDETERMINATE)
                 .setLabel("Please wait...")
@@ -247,7 +282,6 @@ public class Insert_Driver extends AppCompatActivity implements AdapterView.OnIt
                 .setAnimationSpeed(1)
                 .setDimAmount(0.3f);
         final Dialog dialog = new Dialog(Insert_Driver.this);
-
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         // dialog.setContentView(R.layout.custome_dialog_sponsership_pckg);
         dialog.getWindow().setDimAmount((float) 0.6);
@@ -255,17 +289,19 @@ public class Insert_Driver extends AppCompatActivity implements AdapterView.OnIt
 
         stateModels = new ArrayList<>();
         districtModels = new ArrayList<>();
+        drivenToModels = new ArrayList<>();
+        drivenfromModel = new ArrayList<>();
         localCityModels = new ArrayList<>();
+        // ArrayList<DistrictModel> districtModels = new ArrayList<>();
         img_profile = findViewById(R.id.img_profile);
         tv_adhar_pan = findViewById(R.id.tv_adhar_pan);
         tv_pan = findViewById(R.id.tv_pan);
         etFname = findViewById(R.id.etFname);
         etphone1 = findViewById(R.id.etphone1);
+        et_adhar = findViewById(R.id.et_adhar);
         etphone2 = findViewById(R.id.etphone2);
-
         tvSelectCity = findViewById(R.id.tvSelectCity);
         etTotalworkexp = findViewById(R.id.etTotalworkexp);
-
         li_spinner_routes_driven_to = findViewById(R.id.li_spinner_routes_driven_to);
         li_spinner_routes_driven_from = findViewById(R.id.li_spinner_routes_driven_from);
         li_spinner_localcity = findViewById(R.id.li_spinner_localcity);
@@ -280,17 +316,6 @@ public class Insert_Driver extends AppCompatActivity implements AdapterView.OnIt
         et_ref_address = findViewById(R.id.et_ref_address);
         et_ref_contactno = findViewById(R.id.et_ref_contactno);
         et_ref_relation = findViewById(R.id.et_ref_relation);
-        checkbox_tata_ace = findViewById(R.id.checkbox_tata_ace);
-        checkbox_trailer = findViewById(R.id.checkbox_trailer);
-        checkbox_mahindra = findViewById(R.id.checkbox_mahindra);
-        checkbox_407 = findViewById(R.id.checkbox_407);
-        checkbox_1109 = findViewById(R.id.checkbox_1109);
-        checkbox_10tyre = findViewById(R.id.checkbox_10tyre);
-        checkbox_12tyre = findViewById(R.id.checkbox_12tyre);
-        checkbox_t14tyre = findViewById(R.id.checkbox_t14tyre);
-        checkbox_32feetsxl = findViewById(R.id.checkbox_32feetsxl);
-        checkbox_32feetmxl = findViewById(R.id.checkbox_32feetmxl);
-        checkbox_tanker = findViewById(R.id.checkbox_tanker);
         docs_All_pan = findViewById(R.id.docs_All_pan);
         docs_All_adhar = findViewById(R.id.docs_All_adhar);
         btn_submit = findViewById(R.id.btn_submit);
@@ -314,6 +339,32 @@ public class Insert_Driver extends AppCompatActivity implements AdapterView.OnIt
         img_ref_address_proof1 = findViewById(R.id.img_ref_address_proof1);
         img_ref_address_proof2 = findViewById(R.id.img_ref_address_proof2);
         spinner_salary = findViewById(R.id.spinner_salary);
+
+        checkbox_tata_ace = findViewById(R.id.checkbox_tata_ace);
+        checkbox_trailer = findViewById(R.id.checkbox_trailer);
+        checkbox_mahindra = findViewById(R.id.checkbox_mahindra);
+        checkbox_407 = findViewById(R.id.checkbox_407);
+        checkbox_1109 = findViewById(R.id.checkbox_1109);
+        checkbox_10tyre = findViewById(R.id.checkbox_10tyre);
+        checkbox_12tyre = findViewById(R.id.checkbox_12tyre);
+        checkbox_t14tyre = findViewById(R.id.checkbox_t14tyre);
+        checkbox_32feetsxl = findViewById(R.id.checkbox_32feetsxl);
+        checkbox_32feetmxl = findViewById(R.id.checkbox_32feetmxl);
+        checkbox_tanker = findViewById(R.id.checkbox_tanker);
+
+        checkbox_tata_ace.setOnCheckedChangeListener(this);
+        checkbox_trailer.setOnCheckedChangeListener(this);
+        checkbox_mahindra.setOnCheckedChangeListener(this);
+        checkbox_407.setOnCheckedChangeListener(this);
+        checkbox_1109.setOnCheckedChangeListener(this);
+        checkbox_10tyre.setOnCheckedChangeListener(this);
+        checkbox_12tyre.setOnCheckedChangeListener(this);
+        checkbox_t14tyre.setOnCheckedChangeListener(this);
+        checkbox_32feetsxl.setOnCheckedChangeListener(this);
+        checkbox_32feetmxl.setOnCheckedChangeListener(this);
+        checkbox_tanker.setOnCheckedChangeListener(this);
+
+
         btn_submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -324,123 +375,97 @@ public class Insert_Driver extends AppCompatActivity implements AdapterView.OnIt
                     } else if (etphone1.getText().toString().length() != 10) {
                         etphone1.setError("Please enter phone Number");
                         Toast.makeText(Insert_Driver.this, "Please enter phone number...", Toast.LENGTH_SHORT).show();
-                    }/*else if (etphone2.getText().toString().length()!=10){
-                        etphone2.setError("Please enter Alternate phone number");
-                        Toast.makeText(Insert_Driver.this, "Please enter alternate number...", Toast.LENGTH_SHORT).show();
-                    }*/ else if (spinner_personal_Education.getSelectedItem().toString().trim().equals("--select education qualification")) {
-                        // spi.setError("Please enter education qualification");
+                    } else if (spinner_personal_Education.getSelectedItem().toString().trim().equals("--select education qualification")) {
                         Toast.makeText(Insert_Driver.this, "Please enter education qualification...", Toast.LENGTH_SHORT).show();
                     } else if (etTotalworkexp.getText().toString().equals("")) {
                         etTotalworkexp.setError("Please enter Total work experiance");
                         Toast.makeText(Insert_Driver.this, "Please enter Total work experiance...", Toast.LENGTH_SHORT).show();
-                    } else if (spinner_salary.getSelectedItem().toString().trim().equals("--select Salary Range--")) {
-                        // etTotalworkexp.setError("Please enter Total work experiance");
+                    } else if (spinner_salary.getSelectedItem().toString().trim().equals("--Select Salary Range--")) {
                         Toast.makeText(Insert_Driver.this, "Please enter Salary Expectation...", Toast.LENGTH_SHORT).show();
                     } else if (etaddress.getText().toString().equals("")) {
                         etaddress.setError("Please enter Address");
                         Toast.makeText(Insert_Driver.this, "Please enter Address...", Toast.LENGTH_SHORT).show();
                     } else if (spinner_personal_city.getSelectedItem().toString().trim().equals("---Please Select City---")) {
-                        // etFname.setError("Please enter User Name");
                         Toast.makeText(Insert_Driver.this, "Please Select City...", Toast.LENGTH_SHORT).show();
                     } else if (spinner_personal_District.getSelectedItem().toString().trim().equals("---Please Select District---")) {
-                        //etFname.setError("Please enter User Name");
                         Toast.makeText(Insert_Driver.this, "Please Select district...", Toast.LENGTH_SHORT).show();
                     } else if (spinner_personal_statee.getSelectedItem().toString().trim().equals("---Please Select State---")) {
-                        // etFname.setError("Please enter User Name");
                         Toast.makeText(Insert_Driver.this, "Please Select state...", Toast.LENGTH_SHORT).show();
-                    }/* else if (etstreet.getText().toString().equals("")) {
-                        etstreet.setError("Please enter strret");
-                        Toast.makeText(Insert_Driver.this, "Please enter street...", Toast.LENGTH_SHORT).show();
-                    }*//* else if (spinner_personal_driven_from.getSelectedItem().toString().trim().equals("---Please Select Driven To Route---")) {
-                        //  etFname.setError("Please enter User Name");
-                        Toast.makeText(Insert_Driver.this, "Please Select Driven To Route...", Toast.LENGTH_SHORT).show();
-                    }*//*else  if(!checkbox_tata_ace.isChecked() && !checkbox_mahindra.isChecked() && !checkbox_407.isChecked()&& !checkbox_1109.isChecked() && !checkbox_10tyre.isChecked() && !checkbox_12tyre.isChecked()&& !checkbox_t14tyre.isChecked() && !checkbox_32feetsxl.isChecked() && !checkbox_32feetmxl.isChecked()){
-                        //do some validation
-                        Toast.makeText(Insert_Driver.this, "Please validate checkbox...", Toast.LENGTH_SHORT).show();
-                    }*//* else if (spinner_personal_driven_to.getSelectedItem().toString().trim().equals("---Please Select Driven To Route---")) {
-                        //   etFname.setError("Please enter User Name");
-                        Toast.makeText(Insert_Driver.this, "Please Select Driven To Route...", Toast.LENGTH_SHORT).show();
-                    }*//*else if (etdlnumber.getText().toString().equals("")){
-                        etdlnumber.setError("Please enter DL number");
-                        Toast.makeText(Insert_Driver.this, "Please enter DL number...", Toast.LENGTH_SHORT).show();
-                    }*/ else if (spinner_doucument_adhar_pan.getSelectedItem().toString().trim().equals("--Please Select Document--")) {
-                        // etFname.setError("Please enter User Name");
-                        Toast.makeText(Insert_Driver.this, "Please select document...", Toast.LENGTH_SHORT).show();
-                    }/* else if (et_adhar_pan.getText().toString().equals("")||(et_pan.getText().toString().equals(""))) {
-                      //  et_adhar_pan.setError("Please enter number");
-                        Toast.makeText(Insert_Driver.this, "Please enter number...", Toast.LENGTH_SHORT).show();
-                    }*/ else if (etdriving_license_no.getText().toString().equals("")) {
+                    }
+                    else if (checkBoxArray.size() == 0) {
+                        Toast.makeText(Insert_Driver.this, "Please select atleast one checkbox", Toast.LENGTH_SHORT).show();
+                    }
+
+                    else if (spinner_Routes_Driven.getSelectedItem().toString().trim().equals("--Please Select driven Route--")) {
+                        Toast.makeText(Insert_Driver.this, "--Please Select driven Route--", Toast.LENGTH_SHORT).show();
+                    }
+                    else if (spinner_Routes_Driven.getSelectedItem().toString().trim().equals("Local")
+                            && spinner_localcity.getSelectedItem().equals("---Please Select City---")) {
+                        Toast.makeText(Insert_Driver.this, "Please Select Local City", Toast.LENGTH_SHORT).show();
+                    }
+
+                    else if (spinner_Routes_Driven.getSelectedItem().toString().trim().equals("Outstation")
+                            && spinner_personal_driven_from.getSelectedItem().equals("---Please Select City---")) {
+                        Toast.makeText(Insert_Driver.this, "Please Select driven from city", Toast.LENGTH_SHORT).show();
+                    } else if (spinner_Routes_Driven.getSelectedItem().toString().trim().equals("Outstation")
+                            && spinner_personal_driven_to.getSelectedItem().equals("---Please Select City---")) {
+                        Toast.makeText(Insert_Driver.this, "Please Select driven to city", Toast.LENGTH_SHORT).show();
+                    }
+                    else if (imagee1.equals("")) {
+                        Toast.makeText(Insert_Driver.this, "Please upload License image...", Toast.LENGTH_SHORT).show();
+                    }
+                    else if (etdriving_license_no.getText().toString().equals("")) {
                         etdriving_license_no.setError("Please enter Driving license no");
                         Toast.makeText(Insert_Driver.this, "Please enter Driving license no...", Toast.LENGTH_SHORT).show();
                     } else if (tv_license_expiry_date.getText().toString().equals("")) {
-                        tv_license_expiry_date.setError("Please enter license expiry date..");
                         Toast.makeText(Insert_Driver.this, "Please enter license expiry date.....", Toast.LENGTH_SHORT).show();
                     } else if (spinner_license_type.getSelectedItem().toString().trim().equals("---select license type---")) {
-                        // etdriving_license_no.setError("Please enter Driving license no");
                         Toast.makeText(Insert_Driver.this, "Please enter Driving license type...", Toast.LENGTH_SHORT).show();
                     } else if (spinner_casesonDrvinglicense.getSelectedItem().toString().trim().equals("---select cases on license---")) {
-                        //  etdriving_license_no.setError("Please enter Driving license no");
                         Toast.makeText(Insert_Driver.this, "Please select cases on license...", Toast.LENGTH_SHORT).show();
-                    } else if (et_ref_name.getText().toString().equals("")) {
+                    }
+                    else if (spinner_doucument_adhar_pan.getSelectedItem().toString().trim().equals("--Please Select Document--")){
+                        Toast.makeText(Insert_Driver.this, "Please select document...", Toast.LENGTH_SHORT).show();
+                    }
+                    else if (spinner_doucument_adhar_pan.getSelectedItem().toString().trim().equals("Adhar Card") && imagee3.equals("") ){
+
+                        Toast.makeText(Insert_Driver.this, "Please Upload adhar Card image...", Toast.LENGTH_SHORT).show();
+                    }
+
+
+                    else if (spinner_doucument_adhar_pan.getSelectedItem().toString().trim().equals("Adhar Card") && imagee4.equals("") ){
+
+                        Toast.makeText(Insert_Driver.this, "Please Upload adhar Card image...", Toast.LENGTH_SHORT).show();
+                    }
+
+                    else if (spinner_doucument_adhar_pan.getSelectedItem().toString().trim().equals("Adhar Card") && et_adhar.getText().toString().length()<2){
+
+                        Toast.makeText(Insert_Driver.this, "Please enter Adhar Card Number...", Toast.LENGTH_SHORT).show();
+                    }
+                    else if (spinner_doucument_adhar_pan.getSelectedItem().toString().trim().equals("Pan Card") && imagee2.equals("")){
+
+                        Toast.makeText(Insert_Driver.this, "Please Upload Pan Card image...", Toast.LENGTH_SHORT).show();
+                    }else if (spinner_doucument_adhar_pan.getSelectedItem().toString().trim().equals("Pan Card") && et_pan.getText().toString().length()<2){
+
+                        Toast.makeText(Insert_Driver.this, "Please enter Pan Card Number..", Toast.LENGTH_SHORT).show();
+                    }
+                    else if (et_ref_name.getText().toString().equals("")) {
                         et_ref_name.setError("Please enter reference name");
                         Toast.makeText(Insert_Driver.this, "Please enter reference name...", Toast.LENGTH_SHORT).show();
-                    } /*else if (et_ref_address.getText().toString().equals("")) {
-                        et_ref_address.setError("Please enter Reference address");
-                        Toast.makeText(Insert_Driver.this, "Please enter Reference address...", Toast.LENGTH_SHORT).show();
-                    } */ else if (et_ref_contactno.getText().toString().length() != 10) {
+                    } else if (et_ref_contactno.getText().toString().length() != 10) {
                         et_ref_contactno.setError("Please enter Reference Contact No");
                         Toast.makeText(Insert_Driver.this, "Please enter Contact No...", Toast.LENGTH_SHORT).show();
                     } else if (et_ref_relation.getText().toString().equals("")) {
                         et_ref_relation.setError("Please enter Reference relation");
                         Toast.makeText(Insert_Driver.this, "Please enter Reference relation...", Toast.LENGTH_SHORT).show();
                     } else if (imagee.equals("")) {
-                        // img_profile.setError("Please Upload image");
-                        Toast.makeText(Insert_Driver.this, "Please upload profile image...", Toast.LENGTH_SHORT).show();
-                    } else if (imagee1.equals("")) {
-                        // img_profile.setError("Please Upload image");
-                        Toast.makeText(Insert_Driver.this, "Please upload License image...", Toast.LENGTH_SHORT).show();
-                    } /*else if (imagee5.equals("")) {
-                        // img_profile.setError("Please Upload image");
-                        Toast.makeText(Insert_Driver.this, "Please upload reference address proof image..", Toast.LENGTH_SHORT).show();
-                    }*//*else if (imagee6.equals("")){
-                       // img_profile.setError("Please Upload image");
-                        Toast.makeText(Insert_Driver.this, "Please upload reference address proof image..", Toast.LENGTH_SHORT).show();
-                    }*/ else {
 
-                        if (checkbox_tata_ace.isChecked()) {
-                            checkboxdisplay = checkboxdisplay + checkbox_tata_ace.getText() + ",";
-                        }
-                        if (checkbox_mahindra.isChecked()) {
-                            checkboxdisplay = checkboxdisplay + checkbox_mahindra.getText() + ",";
-                        }
-                        if (checkbox_407.isChecked()) {
-                            checkboxdisplay = checkboxdisplay + checkbox_407.getText() + ",";
-                        }
-                        if (checkbox_1109.isChecked()) {
-                            checkboxdisplay = checkboxdisplay + checkbox_1109.getText() + ",";
-                        }
-                        if (checkbox_10tyre.isChecked()) {
-                            checkboxdisplay = checkboxdisplay + checkbox_10tyre.getText() + ",";
-                        }
-                        if (checkbox_12tyre.isChecked()) {
-                            checkboxdisplay = checkboxdisplay + checkbox_12tyre.getText() + ",";
-                        }
-                        if (checkbox_t14tyre.isChecked()) {
-                            checkboxdisplay = checkboxdisplay + checkbox_t14tyre.getText() + ",";
-                        }
-                        if (checkbox_32feetsxl.isChecked()) {
-                            checkboxdisplay = checkboxdisplay + checkbox_32feetsxl.getText() + ",";
-                        }
-                        if (checkbox_32feetmxl.isChecked()) {
-                            checkboxdisplay = checkboxdisplay + checkbox_32feetmxl.getText() + ",";
-                        }
-                        if (checkbox_trailer.isChecked()) {
-                            checkboxdisplay = checkboxdisplay + checkbox_trailer.getText() + ",";
-                        }
-                        if (checkbox_tanker.isChecked()) {
-                            checkboxdisplay = checkboxdisplay + checkbox_trailer.getText() + ",";
-                        }
+                        Toast.makeText(Insert_Driver.this, "Please upload profile image...", Toast.LENGTH_SHORT).show();
+                    }
+                    else {
+                      //  getselectedcheckbox();
                         getinsertdriverapi(dialog);
+
                     }
 
                 } else {
@@ -448,20 +473,126 @@ public class Insert_Driver extends AppCompatActivity implements AdapterView.OnIt
                 }
             }
         });
+
+        etdriving_license_no.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                String etdata = charSequence.toString();
+                //2 mis
+                //  boolean isValid = true;
+                if (i2 <= 8) {
+
+
+                } else {
+
+                }
+
+            }
+
+            private Timer timer = new Timer();
+            private final long DELAY = 1000; // milliseconds
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                Log.d("outer", editable.toString());
+                timer.cancel();
+                timer = new Timer();
+                timer.schedule(
+                        new TimerTask() {
+                            @Override
+                            public void run() {
+                                // you will probably need to use runOnUiThread(Runnable action) for some specific actions (e.g. manipulating views)
+                                String data = editable.toString();
+                                Log.d("inner", data);
+
+                              /* runOnUiThread(new Runnable() {
+                                   @Override
+                                   public void run() {
+                                       getlicincevalidity();
+                                   }
+                               });*/
+                                getlicincevalidity();
+                            }
+                        },
+                        DELAY
+                );
+
+
+            }
+        });
+    }
+
+    private void getselectedcheckbox() {
+        if (checkbox_tata_ace.isChecked()) {
+            checkboxdisplay = checkboxdisplay + checkbox_tata_ace.getText() + ",";
+        }
+        if (checkbox_mahindra.isChecked()) {
+            checkboxdisplay = checkboxdisplay + checkbox_mahindra.getText() + ",";
+        }
+        if (checkbox_407.isChecked()) {
+            checkboxdisplay = checkboxdisplay + checkbox_407.getText() + ",";
+        }
+        if (checkbox_1109.isChecked()) {
+            checkboxdisplay = checkboxdisplay + checkbox_1109.getText() + ",";
+        }
+        if (checkbox_10tyre.isChecked()) {
+            checkboxdisplay = checkboxdisplay + checkbox_10tyre.getText() + ",";
+        }
+        if (checkbox_12tyre.isChecked()) {
+            checkboxdisplay = checkboxdisplay + checkbox_12tyre.getText() + ",";
+        }
+        if (checkbox_t14tyre.isChecked()) {
+            checkboxdisplay = checkboxdisplay + checkbox_t14tyre.getText() + ",";
+        }
+        if (checkbox_32feetsxl.isChecked()) {
+            checkboxdisplay = checkboxdisplay + checkbox_32feetsxl.getText() + ",";
+        }
+        if (checkbox_32feetmxl.isChecked()) {
+            checkboxdisplay = checkboxdisplay + checkbox_32feetmxl.getText() + ",";
+        }
+        if (checkbox_trailer.isChecked()) {
+            checkboxdisplay = checkboxdisplay + checkbox_trailer.getText() + ",";
+        }
+        if (checkbox_tanker.isChecked()) {
+            checkboxdisplay = checkboxdisplay + checkbox_trailer.getText() + ",";
+        }
     }
 
     private void init() {
 
         getCityList();
+        new asynkdistrict().execute();
+
         getLocalCityList();
         getStateList();
-        getDistrict();
-        getDrivento();
-        getDrivenfrom();
+        //getDrivento();
         getsalary();
         getqulification();
         getlicense_type();
         getcasesondrivinglicese();
+
+
+
+
+        //  getDrivenfrom();
+        // setspinnerDrivenfrom();
+
+        /*getDistrict();
+        setSpinnerDriver();*/
+
+        // new asynkgetdrivenfrom().execute();
+//new asynkdrivenfrom().e
+        /*getDrivenfrom();
+        setspinnerDrivenfrom();*/
+
+
+
+
         arrayLists_Routes_Driven = new ArrayList();
         arrayLists_Routes_Driven.add("--Please Select driven Route--");
         arrayLists_Routes_Driven.add("Local");
@@ -469,7 +600,7 @@ public class Insert_Driver extends AppCompatActivity implements AdapterView.OnIt
         setRole(arrayLists_Routes_Driven, spinner_Routes_Driven);
 
         arrayList_doucument_adhar_pan = new ArrayList();
-        arrayList_doucument_adhar_pan.add("--Please Select Doucument--");
+        arrayList_doucument_adhar_pan.add("--Please Select Document--");
         arrayList_doucument_adhar_pan.add("Adhar Card");
         arrayList_doucument_adhar_pan.add("Pan Card");
         setRole(arrayList_doucument_adhar_pan, spinner_doucument_adhar_pan);
@@ -519,6 +650,8 @@ public class Insert_Driver extends AppCompatActivity implements AdapterView.OnIt
                 startActivity(intent);
             }
         });
+
+
         tv_license_expiry_date.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -532,12 +665,50 @@ public class Insert_Driver extends AppCompatActivity implements AdapterView.OnIt
                             @Override
                             public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
                                 tv_license_expiry_date.setText(dayOfMonth + "/" + (monthOfYear + 1) + "/" + year);
+                               /* tv_license_expiry_date.setText(new StringBuilder().append(month)
+                                        .append("-").append(day).append("-").append(year)
+                                        .append(" "));*/
                             }
                         }, year, month, day);
+                picker.getDatePicker().setMinDate(System.currentTimeMillis()-1000);
+                picker.setTitle(getResources().getString(
+                        R.string.alert_date_select));
                 picker.show();
                 tv_license_expiry_date.setTextColor(Color.DKGRAY);
+
+
+                /*final Calendar mcurrentDate = Calendar.getInstance();
+                int mYear = mcurrentDate.get(Calendar.YEAR);
+                int mMonth = mcurrentDate.get(Calendar.MONTH);
+                int mDay = mcurrentDate.get(Calendar.DAY_OF_MONTH);
+
+                DatePickerDialog mDatePicker = new DatePickerDialog(
+                        Insert_Driver.this, new DatePickerDialog.OnDateSetListener() {
+                    public void onDateSet(DatePicker datepicker,
+                                          int selectedyear, int selectedmonth,
+                                          int selectedday) {
+
+                        mcurrentDate.set(Calendar.YEAR, selectedyear);
+                        mcurrentDate.set(Calendar.MONTH, selectedmonth);
+                        mcurrentDate.set(Calendar.DAY_OF_MONTH,
+                                selectedday);
+*//*                        @SuppressLint("SimpleDateFormat") SimpleDateFormat sdf;
+                        sdf = new SimpleDateFormat(mDay - mMonth - mYear);*//*
+
+                     //   SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd").parse();
+                        tv_license_expiry_date.setText(new StringBuilder().append(mMonth)
+                                .append("-").append(mday).append("-").append(mYear)
+                                .append(" "));
+                    }
+                }, mYear, mMonth, mDay);
+                mDatePicker.getDatePicker().setMinDate(System.currentTimeMillis());
+                mDatePicker.setTitle(getResources().getString(
+                        R.string.alert_date_select));
+                mDatePicker.show();*/
             }
         });
+
+
 
 
         img_profile.setOnClickListener(new View.OnClickListener() {
@@ -653,6 +824,8 @@ public class Insert_Driver extends AppCompatActivity implements AdapterView.OnIt
         });
 
     }
+
+
 
 
     @SuppressLint("NewApi")
@@ -957,46 +1130,45 @@ public class Insert_Driver extends AppCompatActivity implements AdapterView.OnIt
             StringRequest stringRequest = new StringRequest(Request.Method.GET, ApiConstant.CITY, new Response.Listener<String>() {
                 @Override
                 public void onResponse(String response) {
-                    cityModelArrayList = getJson(response);
-                    Log.d("city_list", String.valueOf(cityNameList.size()));
-                    // print kar na  cityNameList.size()
 
-                    cityId.clear();
-                    cityName.clear();
+                    new Thread(() -> {
+                       // localCityModels = getJsonLocalcity(response);
+                        cityModelArrayList = getJson(response);
 
-                    for (int i = 0; i < cityModelArrayList.size(); i++) {
+                        Log.d("city_list", String.valueOf(cityNameList.size()));
 
-                        cityId.add(cityModelArrayList.get(i).getId().toString());
-                        cityName.add(cityModelArrayList.get(i).getCity().toString());
-
-
-                    }
-
-                    cityId.add(0, "0");
-                    cityName.add(0, "---Please Select City---");
-
-                    final ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(Insert_Driver.this, R.layout.cutom_spiner, cityName);
-                    spinnerArrayAdapter.setDropDownViewResource(R.layout.cutom_spiner); // The drop down view
-                    spinner_personal_city.setAdapter(spinnerArrayAdapter);
-                    spinner_personal_city.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                        @Override
-                        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
-                            // sent_amount_Id = amountIdList.get(position);
-
-                            String selectedCityName = cityName.get(position);
-                            String selectedCityId = cityId.get(position);
-                            //  spinner_personal_city.setPositiveButton("OK");
+                        cityId.clear();
+                        cityName.clear();
+                        for (int i = 0; i < cityModelArrayList.size(); i++) {
+                            cityId.add(cityModelArrayList.get(i).getId());
+                            cityName.add(cityModelArrayList.get(i).getCity());
                         }
 
-                        @Override
-                        public void onNothingSelected(AdapterView<?> arg0) {
+                        cityId.add(0, "0");
+                        cityName.add(0, "---Please Select City---");
 
-                        }
-                    });
+                        runOnUiThread(() -> {
+                            final ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(Insert_Driver.this, R.layout.cutom_spiner, cityName);
+                            spinnerArrayAdapter.setDropDownViewResource(R.layout.cutom_spiner); // The drop down view
+                            spinner_personal_city.setAdapter(spinnerArrayAdapter);
+                            spinner_personal_city.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                                @Override
+                                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                                    // sent_amount_Id = amountIdList.get(position);
+                                   /* String selectedCityName = cityName.get(position);
+                                    String selectedCityId = cityId.get(position);*/
+                                    //  spinner_personal_city.setPositiveButton("OK");
+                                }
 
-                    // setCity(cityModelArrayList, spinner_personal_city);
-                    dismissDialog();
+                                @Override
+                                public void onNothingSelected(AdapterView<?> arg0) {
+                                }
+                            });
+
+                            // setCity(cityModelArrayList, spinner_personal_city);
+                            dismissDialog();
+                        });
+                    }).start();
 
                 }
             }, new Response.ErrorListener() {
@@ -1026,72 +1198,74 @@ public class Insert_Driver extends AppCompatActivity implements AdapterView.OnIt
                 @Override
                 public void onResponse(String response) {
                     //cityModelArrayList = getJson(response);
-                    try {
-                        JSONObject jsonObject1 = new JSONObject(response);
-                        boolean error = jsonObject1.getBoolean("error");
-                        if (error == false) {
-                            String message = jsonObject1.getString("message");
-                            JSONArray jsonArray = jsonObject1.getJSONArray("data");
-                            for (int i = 0; i < jsonArray.length(); i++) {
-                                JSONObject jsonObject11 = jsonArray.getJSONObject(i);
-                                String id = jsonObject11.getString("id");
-                                String salary_expectation = jsonObject11.getString("salary_expectation");
-                                SalaryModel salaryModel = new SalaryModel(id, salary_expectation);
-                                salaryModel.setId(id);
-                                salaryModel.setId(salary_expectation);
-                                arrayList_salary.add(salaryModel);
+                    new Thread(() -> {
+                        try {
+                            JSONObject jsonObject1 = new JSONObject(response);
+                            boolean error = jsonObject1.getBoolean("error");
+                            if (error == false) {
+                                String message = jsonObject1.getString("message");
+                                JSONArray jsonArray = jsonObject1.getJSONArray("data");
+                                for (int i = 0; i < jsonArray.length(); i++) {
+                                    JSONObject jsonObject11 = jsonArray.getJSONObject(i);
+                                    String id = jsonObject11.getString("id");
+                                    String salary_expectation = jsonObject11.getString("salary_expectation");
+                                    SalaryModel salaryModel = new SalaryModel(id, salary_expectation);
+                                    salaryModel.setId(id);
+                                    salaryModel.setId(salary_expectation);
+                                    arrayList_salary.add(salaryModel);
+                                }
                             }
-                        }
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-
-
-                    //  Log.d("city_list", String.valueOf(cityNameList.size()));
-                    // print kar na  cityNameList.size()
-
-                    salaryId.clear();
-                    salaryName.clear();
-
-                    for (int i = 0; i < arrayList_salary.size(); i++) {
-
-                        salaryId.add(arrayList_salary.get(i).getId().toString());
-                        salaryName.add(arrayList_salary.get(i).getSalary_expectation().toString());
-
-
-                    }
-
-                    salaryId.add(0, "0");
-                    salaryName.add(0, "--select Salary Range--");
-
-                    final ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(Insert_Driver.this, R.layout.cutom_spiner, salaryName);
-                    spinnerArrayAdapter.setDropDownViewResource(R.layout.cutom_spiner); // The drop down view
-                    spinner_salary.setAdapter(spinnerArrayAdapter);
-                    spinner_salary.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                        @Override
-                        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
-                            // sent_amount_Id = amountIdList.get(position);
-
-                            String selectedsalName = salaryName.get(position);
-                            String selectedsalId = salaryId.get(position);
-                            //  spinner_personal_city.setPositiveButton("OK");
+                        } catch (JSONException e) {
+                            e.printStackTrace();
                         }
 
-                        @Override
-                        public void onNothingSelected(AdapterView<?> arg0) {
+
+                        //  Log.d("city_list", String.valueOf(cityNameList.size()));
+                        // print kar na  cityNameList.size()
+
+                        salaryId.clear();
+                        salaryName.clear();
+
+                        for (int i = 0; i < arrayList_salary.size(); i++) {
+
+                            salaryId.add(arrayList_salary.get(i).getId());
+                            salaryName.add(arrayList_salary.get(i).getSalary_expectation().toString());
+
 
                         }
-                    });
 
-                    // setCity(cityModelArrayList, spinner_personal_city);
-                    dismissDialog();
+                        salaryId.add(0, "0");
+                        salaryName.add(0, "--Select Salary Range--");
+                        runOnUiThread(() -> {
+                            final ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(Insert_Driver.this, R.layout.cutom_spiner, salaryName);
+                            spinnerArrayAdapter.setDropDownViewResource(R.layout.cutom_spiner); // The drop down view
+                            spinner_salary.setAdapter(spinnerArrayAdapter);
+                            spinner_salary.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                                @Override
+                                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
+                                    // sent_amount_Id = amountIdList.get(position);
+
+                                  /*  String selectedsalName = salaryName.get(position);
+                                    String selectedsalId = salaryId.get(position);*/
+                                    //  spinner_personal_city.setPositiveButton("OK");
+                                }
+
+                                @Override
+                                public void onNothingSelected(AdapterView<?> arg0) {
+
+                                }
+                            });
+
+                            // setCity(cityModelArrayList, spinner_personal_city);
+                            dialog.dismiss();
+                        });
+                    }).start();
                 }
             }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
-                    dismissDialog();
+                    dialog.dismiss();
                     Toast.makeText(Insert_Driver.this, error.toString(), Toast.LENGTH_SHORT).show();
                 }
             });
@@ -1101,7 +1275,7 @@ public class Insert_Driver extends AppCompatActivity implements AdapterView.OnIt
                     DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
             requestQueue.add(stringRequest);
         } else {
-            dismissDialog();
+            dialog.dismiss();
             Toast.makeText(getApplicationContext(), "Please check internet connection", Toast.LENGTH_SHORT).show();
         }
 
@@ -1116,67 +1290,72 @@ public class Insert_Driver extends AppCompatActivity implements AdapterView.OnIt
                 @Override
                 public void onResponse(String response) {
                     //cityModelArrayList = getJson(response);
-                    try {
-                        JSONObject jsonObject1 = new JSONObject(response);
-                        boolean error = jsonObject1.getBoolean("error");
-                        if (error == false) {
-                            String message = jsonObject1.getString("message");
-                            JSONArray jsonArray = jsonObject1.getJSONArray("data");
-                            for (int i = 0; i < jsonArray.length(); i++) {
-                                JSONObject jsonObject11 = jsonArray.getJSONObject(i);
-                                String id = jsonObject11.getString("id");
-                                String Qualification = jsonObject11.getString("Qualification");
-                                QualificationModel qualificationModel = new QualificationModel(id, Qualification);
-                                qualificationModel.setId(id);
-                                qualificationModel.setId(Qualification);
-                                arrayList_qulification.add(qualificationModel);
+                    new Thread(() -> {
+
+
+                        try {
+                            JSONObject jsonObject1 = new JSONObject(response);
+                            boolean error = jsonObject1.getBoolean("error");
+                            if (error == false) {
+                                String message = jsonObject1.getString("message");
+                                JSONArray jsonArray = jsonObject1.getJSONArray("data");
+                                for (int i = 0; i < jsonArray.length(); i++) {
+                                    JSONObject jsonObject11 = jsonArray.getJSONObject(i);
+                                    String id = jsonObject11.getString("id");
+                                    String Qualification = jsonObject11.getString("Qualification");
+                                    QualificationModel qualificationModel = new QualificationModel(id, Qualification);
+                                    qualificationModel.setId(id);
+                                    qualificationModel.setId(Qualification);
+                                    arrayList_qulification.add(qualificationModel);
+                                }
                             }
-                        }
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-
-
-                    //  Log.d("city_list", String.valueOf(cityNameList.size()));
-                    // print kar na  cityNameList.size()
-
-                    qulificationId.clear();
-                    qulificationName.clear();
-
-                    for (int i = 0; i < arrayList_qulification.size(); i++) {
-
-                        qulificationId.add(arrayList_qulification.get(i).getId().toString());
-                        qulificationName.add(arrayList_qulification.get(i).getQualification().toString());
-
-
-                    }
-
-                    qulificationId.add(0, "0");
-                    qulificationName.add(0, "--select education qualification");
-
-                    final ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(Insert_Driver.this, R.layout.cutom_spiner, qulificationName);
-                    spinnerArrayAdapter.setDropDownViewResource(R.layout.cutom_spiner); // The drop down view
-                    spinner_personal_Education.setAdapter(spinnerArrayAdapter);
-                    spinner_personal_Education.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                        @Override
-                        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
-                            // sent_amount_Id = amountIdList.get(position);
-
-                            String selectedsalNamee = qulificationName.get(position);
-                            String selectedsalIdd = qulificationId.get(position);
-                            //  spinner_personal_city.setPositiveButton("OK");
+                        } catch (JSONException e) {
+                            e.printStackTrace();
                         }
 
-                        @Override
-                        public void onNothingSelected(AdapterView<?> arg0) {
+
+                        //  Log.d("city_list", String.valueOf(cityNameList.size()));
+                        // print kar na  cityNameList.size()
+
+                        qulificationId.clear();
+                        qulificationName.clear();
+
+                        for (int i = 0; i < arrayList_qulification.size(); i++) {
+
+                            qulificationId.add(arrayList_qulification.get(i).getId().toString());
+                            qulificationName.add(arrayList_qulification.get(i).getQualification().toString());
+
 
                         }
-                    });
 
-                    // setCity(cityModelArrayList, spinner_personal_city);
-                    dismissDialog();
+                        qulificationId.add(0, "0");
+                        qulificationName.add(0, "--select education qualification");
+                        runOnUiThread(() -> {
+                            final ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(Insert_Driver.this, R.layout.cutom_spiner, qulificationName);
+                            spinnerArrayAdapter.setDropDownViewResource(R.layout.cutom_spiner); // The drop down view
+                            spinner_personal_Education.setAdapter(spinnerArrayAdapter);
+                            spinner_personal_Education.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                                @Override
+                                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
+                                    // sent_amount_Id = amountIdList.get(position);
+
+                                   /* String selectedsalNamee = qulificationName.get(position);
+                                    String selectedsalIdd = qulificationId.get(position);*/
+                                    //  spinner_personal_city.setPositiveButton("OK");
+                                }
+
+                                @Override
+                                public void onNothingSelected(AdapterView<?> arg0) {
+
+                                }
+                            });
+
+                            // setCity(cityModelArrayList, spinner_personal_city);
+                            dismissDialog();
+
+                        });
+                    }).start();
                 }
             }, new Response.ErrorListener() {
                 @Override
@@ -1212,17 +1391,18 @@ public class Insert_Driver extends AppCompatActivity implements AdapterView.OnIt
                 @Override
                 public void onResponse(String response) {
                     //cityModelArrayList = getJson(response);
-                    try {
+                    new Thread(() -> {
+                        try {
 
 
-                        LicensetypeModel ob=new Gson().fromJson(response,LicensetypeModel.class);
-                        Log.e("Response",response);
-if( !                       ob.getError()){
+                            LicensetypeModel ob = new Gson().fromJson(response, LicensetypeModel.class);
+                            Log.e("Response", response);
+                            if (!ob.getError()) {
 
 
-    arrayList_licensetype=new ArrayList<>();
-    arrayList_licensetype=ob.getData();
-}
+                                arrayList_licensetype = new ArrayList<>();
+                                arrayList_licensetype = ob.getData();
+                            }
 //                        JSONObject jsonObject1 = new JSONObject(response);
 //                        boolean error = jsonObject1.getBoolean("error");
 //                        if (error == false) {
@@ -1239,52 +1419,54 @@ if( !                       ob.getError()){
 //                                arrayList_licensetype.add(licensetypeModel);
 //                            }
 //                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-
-
-                    //  Log.d("city_list", String.valueOf(cityNameList.size()));
-                    // print kar na  cityNameList.size()
-
-                    license_typeId.clear();
-                    license_typeName.clear();
-
-                    for (int i = 0; i < arrayList_licensetype.size(); i++) {
-
-                        license_typeId.add(""+arrayList_licensetype.get(i).getId());
-                        license_typeName.add(""+arrayList_licensetype.get(i).getType());
-
-
-
-                    }
-
-                    license_typeId.add(0, "0");
-                    license_typeName.add(0, "---select license type---");
-
-                    final ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(Insert_Driver.this, R.layout.cutom_spiner, license_typeName);
-                    spinnerArrayAdapter.setDropDownViewResource(R.layout.cutom_spiner); // The drop down view
-                    spinner_license_type.setAdapter(spinnerArrayAdapter);
-                    spinner_license_type.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                        @Override
-                        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
-                            // sent_amount_Id = amountIdList.get(position);
-
-                            String selectedsalNameea = license_typeName.get(position);
-                            String selectedsalIdda = license_typeId.get(position);
-                            //  spinner_personal_city.setPositiveButton("OK");
+                        } catch (Exception e) {
+                            e.printStackTrace();
                         }
 
-                        @Override
-                        public void onNothingSelected(AdapterView<?> arg0) {
+
+                        //  Log.d("city_list", String.valueOf(cityNameList.size()));
+                        // print kar na  cityNameList.size()
+
+                        license_typeId.clear();
+                        license_typeName.clear();
+
+                        for (int i = 0; i < arrayList_licensetype.size(); i++) {
+
+                            license_typeId.add("" + arrayList_licensetype.get(i).getId());
+                            license_typeName.add("" + arrayList_licensetype.get(i).getType());
+
 
                         }
-                    });
 
-                    // setCity(cityModelArrayList, spinner_personal_city);
-                    dismissDialog();
+                        license_typeId.add(0, "0");
+                        license_typeName.add(0, "---select license type---");
+                        runOnUiThread(() -> {
+                            final ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(Insert_Driver.this, R.layout.cutom_spiner, license_typeName);
+                            spinnerArrayAdapter.setDropDownViewResource(R.layout.cutom_spiner); // The drop down view
+                            spinner_license_type.setAdapter(spinnerArrayAdapter);
+                            spinner_license_type.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                                @Override
+                                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
+                                    // sent_amount_Id = amountIdList.get(position);
+
+                                   /* String selectedsalNameea = license_typeName.get(position);
+                                    String selectedsalIdda = license_typeId.get(position);*/
+                                    //  spinner_personal_city.setPositiveButton("OK");
+                                }
+
+                                @Override
+                                public void onNothingSelected(AdapterView<?> arg0) {
+
+                                }
+                            });
+
+                            // setCity(cityModelArrayList, spinner_personal_city);
+                            dismissDialog();
+
+
+                        });
+                    }).start();
                 }
             }, new Response.ErrorListener() {
                 @Override
@@ -1314,67 +1496,71 @@ if( !                       ob.getError()){
                 @Override
                 public void onResponse(String response) {
                     //cityModelArrayList = getJson(response);
-                    try {
-                        JSONObject jsonObject1 = new JSONObject(response);
-                        boolean error = jsonObject1.getBoolean("error");
-                        if (error == false) {
-                            String message = jsonObject1.getString("message");
-                            JSONArray jsonArray = jsonObject1.getJSONArray("data");
-                            for (int i = 0; i < jsonArray.length(); i++) {
-                                JSONObject jsonObject11 = jsonArray.getJSONObject(i);
-                                String id = jsonObject11.getString("id");
-                                String Cases_On_Driving_License = jsonObject11.getString("Cases_On_Driving_License");
-                                CasesondrivinglicModel casesondrivinglicModel = new CasesondrivinglicModel(id, Cases_On_Driving_License);
-                                casesondrivinglicModel.setId(id);
-                                casesondrivinglicModel.setCases_On_Driving_License(Cases_On_Driving_License);
-                                arrayList_casesondrivinglicense.add(casesondrivinglicModel);
+                    new Thread(() -> {
+                        try {
+                            JSONObject jsonObject1 = new JSONObject(response);
+                            boolean error = jsonObject1.getBoolean("error");
+                            if (error == false) {
+                                String message = jsonObject1.getString("message");
+                                JSONArray jsonArray = jsonObject1.getJSONArray("data");
+                                for (int i = 0; i < jsonArray.length(); i++) {
+                                    JSONObject jsonObject11 = jsonArray.getJSONObject(i);
+                                    String id = jsonObject11.getString("id");
+                                    String Cases_On_Driving_License = jsonObject11.getString("Cases_On_Driving_License");
+                                    CasesondrivinglicModel casesondrivinglicModel = new CasesondrivinglicModel(id, Cases_On_Driving_License);
+                                    casesondrivinglicModel.setId(id);
+                                    casesondrivinglicModel.setCases_On_Driving_License(Cases_On_Driving_License);
+                                    arrayList_casesondrivinglicense.add(casesondrivinglicModel);
+                                }
                             }
-                        }
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-
-
-                    //  Log.d("city_list", String.valueOf(cityNameList.size()));
-                    // print kar na  cityNameList.size()
-
-                    cases_on_driving_licenseId.clear();
-                    cases_on_driving_licenseName.clear();
-
-                    for (int i = 0; i < arrayList_casesondrivinglicense.size(); i++) {
-
-                        cases_on_driving_licenseId.add(arrayList_casesondrivinglicense.get(i).getId().toString());
-                        cases_on_driving_licenseName.add(arrayList_casesondrivinglicense.get(i).getCases_On_Driving_License().toString());
-
-
-                    }
-
-                    cases_on_driving_licenseId.add(0, "0");
-                    cases_on_driving_licenseName.add(0, "---select cases on license---");
-
-                    final ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(Insert_Driver.this, R.layout.cutom_spiner, cases_on_driving_licenseName);
-                    spinnerArrayAdapter.setDropDownViewResource(R.layout.cutom_spiner); // The drop down view
-                    spinner_casesonDrvinglicense.setAdapter(spinnerArrayAdapter);
-                    spinner_casesonDrvinglicense.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                        @Override
-                        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
-                            // sent_amount_Id = amountIdList.get(position);
-
-                            String selectedsalNameeas = cases_on_driving_licenseName.get(position);
-                            String selectedsalIdsda = cases_on_driving_licenseId.get(position);
-                            //  spinner_personal_city.setPositiveButton("OK");
+                        } catch (JSONException e) {
+                            e.printStackTrace();
                         }
 
-                        @Override
-                        public void onNothingSelected(AdapterView<?> arg0) {
+
+                        //  Log.d("city_list", String.valueOf(cityNameList.size()));
+                        // print kar na  cityNameList.size()
+
+                        cases_on_driving_licenseId.clear();
+                        cases_on_driving_licenseName.clear();
+
+                        for (int i = 0; i < arrayList_casesondrivinglicense.size(); i++) {
+
+                            cases_on_driving_licenseId.add(arrayList_casesondrivinglicense.get(i).getId().toString());
+                            cases_on_driving_licenseName.add(arrayList_casesondrivinglicense.get(i).getCases_On_Driving_License().toString());
+
 
                         }
-                    });
 
-                    // setCity(cityModelArrayList, spinner_personal_city);
-                    dismissDialog();
+                        cases_on_driving_licenseId.add(0, "0");
+                        cases_on_driving_licenseName.add(0, "---select cases on license---");
+                        runOnUiThread(() -> {
+                            final ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(Insert_Driver.this, R.layout.cutom_spiner, cases_on_driving_licenseName);
+                            spinnerArrayAdapter.setDropDownViewResource(R.layout.cutom_spiner); // The drop down view
+                            spinner_casesonDrvinglicense.setAdapter(spinnerArrayAdapter);
+                            spinner_casesonDrvinglicense.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                                @Override
+                                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
+                                    // sent_amount_Id = amountIdList.get(position);
+
+                                    /*String selectedsalNameeas = cases_on_driving_licenseName.get(position);
+                                    String selectedsalIdsda = cases_on_driving_licenseId.get(position);*/
+                                    //  spinner_personal_city.setPositiveButton("OK");
+                                }
+
+                                @Override
+                                public void onNothingSelected(AdapterView<?> arg0) {
+
+                                }
+                            });
+
+                            // setCity(cityModelArrayList, spinner_personal_city);
+                            dismissDialog();
+
+
+                        });
+                    }).start();
                 }
             }, new Response.ErrorListener() {
                 @Override
@@ -1398,6 +1584,7 @@ if( !                       ob.getError()){
 
     ArrayList<StateModel> getJsonState(String response) {
         ArrayList<StateModel> array = new ArrayList<>();
+
         try {
             JSONObject jsonObject = new JSONObject(response);
             boolean error = jsonObject.getBoolean("error");
@@ -1424,6 +1611,7 @@ if( !                       ob.getError()){
     ArrayList<LocalCityModel> getJsonLocalcity(String response) {
         ArrayList<LocalCityModel> array = new ArrayList<>();
         try {
+
             JSONObject jsonObject = new JSONObject(response);
             boolean error = jsonObject.getBoolean("error");
             String message = jsonObject.getString("message");
@@ -1453,52 +1641,57 @@ if( !                       ob.getError()){
     }
 
     public void getStateList() {
+        dialog.show();
         if (ApiConstant.isConnected(getApplicationContext())) {
             StringRequest stringRequest = new StringRequest(Request.Method.GET, ApiConstant.STATE, new Response.Listener<String>() {
                 @Override
                 public void onResponse(String response) {
+                    new Thread(() -> {
 
-                    stateModels = getJsonState(response);
-                    stateId.clear();
-                    stateName.clear();
+                        stateModels = getJsonState(response);
+                        stateId.clear();
+                        stateName.clear();
 
-                    for (int i = 0; i < stateModels.size(); i++) {
+                        for (int i = 0; i < stateModels.size(); i++) {
 
-                        stateId.add(stateModels.get(i).getId().toString());
-                        stateName.add(stateModels.get(i).getState().toString());
+                            stateId.add(stateModels.get(i).getId().toString());
+                            stateName.add(stateModels.get(i).getState().toString());
 
 
-                    }
-
-                    stateId.add(0, "0");
-                    stateName.add(0, "---Please Select State---");
-
-                    final ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(Insert_Driver.this, R.layout.cutom_spiner, stateName);
-                    spinnerArrayAdapter.setDropDownViewResource(R.layout.cutom_spiner); // The drop down view
-                    spinner_personal_statee.setAdapter(spinnerArrayAdapter);
-                    spinner_personal_statee.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                        @Override
-                        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
-                            // sent_amount_Id = amountIdList.get(position);
-
-                            String selectedstateName = stateName.get(position);
-                            String selectedstateId = stateId.get(position);
                         }
 
-                        @Override
-                        public void onNothingSelected(AdapterView<?> arg0) {
+                        stateId.add(0, "0");
+                        stateName.add(0, "---Please Select State---");
+                        runOnUiThread(() -> {
+                            final ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(Insert_Driver.this, R.layout.cutom_spiner, stateName);
+                            spinnerArrayAdapter.setDropDownViewResource(R.layout.cutom_spiner); // The drop down view
+                            spinner_personal_statee.setAdapter(spinnerArrayAdapter);
+                            spinner_personal_statee.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                                @Override
+                                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
-                        }
-                    });
+                                    // sent_amount_Id = amountIdList.get(position);
 
-                    // setCity(cityModelArrayList, spinner_personal_city);
+                                    /*String selectedstateName = stateName.get(position);
+                                    String selectedstateId = stateId.get(position);*/
+                                }
 
+                                @Override
+                                public void onNothingSelected(AdapterView<?> arg0) {
 
+                                }
+                            });
+
+                            // setCity(cityModelArrayList, spinner_personal_city);
+
+                            dialog.dismiss();
+                        });
+                    }).start();
                 }
             }, new Response.ErrorListener() {
                 @Override
                 public void onErrorResponse(VolleyError error) {
+                    dialog.dismiss();
                     Toast.makeText(Insert_Driver.this, error.toString(), Toast.LENGTH_SHORT).show();
                 }
             });
@@ -1508,6 +1701,7 @@ if( !                       ob.getError()){
                     DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
             requestQueue.add(stringRequest);
         } else {
+            dialog.dismiss();
             Toast.makeText(getApplicationContext(), "Please check internet connection", Toast.LENGTH_SHORT).show();
         }
 
@@ -1519,37 +1713,89 @@ if( !                       ob.getError()){
             StringRequest stringRequest = new StringRequest(Request.Method.GET, ApiConstant.LOcal_City, new Response.Listener<String>() {
                 @Override
                 public void onResponse(String response) {
-                    localCityModels = getJsonLocalcity(response);
+                    new Thread(() -> {
+                        localCityModels = getJsonLocalcity(response);
 
-                    //localcityId.clear();
-                    //localcityName.clear();
+                        //localcityId.clear();
+                        //localcityName.clear();
                  /*   for (int i = 0; i < localCityModels.size(); i++) {
                         localcityId.add(localCityModels.get(i).getId());
                         localcityName.add(localCityModels.get(i).getCity());
                     }*/
 
-                    localcityId.add(0, "0");
-                    localcityName.add(0, "---Please Select Local City---");
+                        runOnUiThread(() -> {
 
-                    final ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(Insert_Driver.this, R.layout.cutom_spiner, localcityName);
-                    spinnerArrayAdapter.setDropDownViewResource(R.layout.cutom_spiner); // The drop down view
-                    spinner_localcity.setAdapter(spinnerArrayAdapter);
-                    spinner_localcity.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                        @Override
-                        public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
-                            // sent_amount_Id = amountIdList.get(position);
+                            localcityId.add(0, "0");
+                            localcityName.add(0, "---Please Select City---");
+                            final ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(Insert_Driver.this, R.layout.cutom_spiner, localcityName);
+                            spinnerArrayAdapter.setDropDownViewResource(R.layout.cutom_spiner); // The drop down view
+                            spinner_localcity.setAdapter(spinnerArrayAdapter);
+                            spinner_localcity.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                                @Override
+                                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
-                            String slectlocalcityname = localcityName.get(position);
-                            String slectlocalcityid = localcityId.get(position);
-                        }
+                                    // sent_amount_Id = amountIdList.get(position);
 
-                        @Override
-                        public void onNothingSelected(AdapterView<?> arg0) {
+                                   /* String slectlocalcityname = localcityName.get(position);
+                                    String slectlocalcityid = localcityId.get(position);*/
+                                    spinnerItem = true;
+                                }
 
-                        }
-                    });
+                                @Override
+                                public void onNothingSelected(AdapterView<?> arg0) {
+                                    //   Toast.makeText(Insert_Driver.this, "Please select city", Toast.LENGTH_SHORT).show();
+                                    spinnerItem = false;
+                                }
 
+                            });
+                            final ArrayAdapter<String> spinnerArrayAdapter1 = new ArrayAdapter<String>(Insert_Driver.this, R.layout.cutom_spiner, localcityName);
+                            spinnerArrayAdapter1.setDropDownViewResource(R.layout.cutom_spiner); // The drop down view
+                            spinner_personal_driven_to.setAdapter(spinnerArrayAdapter);
+                            spinner_personal_driven_to.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                                @Override
+                                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+
+                                    // sent_amount_Id = amountIdList.get(position);
+
+                                   /* String slectlocalcityname = localcityName.get(position);
+                                    String slectlocalcityid = localcityId.get(position);*/
+                                }
+
+                                @Override
+                                public void onNothingSelected(AdapterView<?> arg0) {
+
+//                                    Toast.makeText(Insert_Driver.this, "Please select driven to city", Toast.LENGTH_SHORT).show();
+                                }
+
+                            });
+
+
+                            final ArrayAdapter<String> spinnerArrayAdapter2 = new ArrayAdapter<String>(Insert_Driver.this, R.layout.cutom_spiner, localcityName);
+                            spinnerArrayAdapter2.setDropDownViewResource(R.layout.cutom_spiner); // The drop down view
+                            spinner_personal_driven_from.setAdapter(spinnerArrayAdapter);
+                            spinner_personal_driven_from.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                                @Override
+                                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                                    // sent_amount_Id = amountIdList.get(position);
+
+                                   /* String slectlocalcityname = localcityName.get(position);
+                                    String slectlocalcityid = localcityId.get(position);*/
+                                }
+
+                                @Override
+                                public void onNothingSelected(AdapterView<?> arg0) {
+
+//                                    Toast.makeText(Insert_Driver.this, "Please select driven from city", Toast.LENGTH_SHORT).show();
+                                }
+
+                            });
+
+
+                        });
+                    }).start();
                 }
             }, new Response.ErrorListener() {
                 @Override
@@ -1591,55 +1837,12 @@ if( !                       ob.getError()){
 
     public void getDistrict() {
         if (ApiConstant.isConnected(getApplicationContext())) {
-            StringRequest stringRequest = new StringRequest(Request.Method.GET, ApiConstant.DISTRICT, new Response.Listener<String>() {
+            StringRequest stringRequest = new StringRequest(Request.Method.GET, ApiConstant.LOcal_City, new Response.Listener<String>() {
                 @Override
                 public void onResponse(String response) {
-                    try {
-                        ArrayList<DistrictModel> districtModels = new ArrayList<>();
-                        JSONObject jsonObject = new JSONObject(response);
-                        boolean error = jsonObject.getBoolean("error");
-                        String message = jsonObject.getString("message");
-                        if (error == false) {
-                            JSONArray jsonArray = jsonObject.getJSONArray("data");
-                            for (int j = 0; j < jsonArray.length(); j++) {
-                                JSONObject jsonObject1 = jsonArray.getJSONObject(j);
-                                String id = jsonObject1.getString("id");
-                                String district = jsonObject1.getString("district");
-                                DistrictModel districtt = new DistrictModel(id, district);
-                                districtt.setId(id);
-                                districtt.setDistrict(district);
-                                districtModels.add(districtt);
-                                DistrictId.clear();
-                                DistrictName.clear();
-                                for (int i = 0; i < districtModels.size(); i++) {
-                                    DistrictId.add(districtModels.get(i).getId().toString());
-                                    DistrictName.add(districtModels.get(i).getDistrict().toString());
-                                }
-                                DistrictId.add(0, "0");
-                                DistrictName.add(0, "---Please Select District---");
-                                final ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(Insert_Driver.this, R.layout.cutom_spiner, DistrictName);
-                                spinnerArrayAdapter.setDropDownViewResource(R.layout.cutom_spiner); // The drop down view
-                                spinner_personal_District.setAdapter(spinnerArrayAdapter);
-                                spinner_personal_District.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                                    @Override
-                                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
-                                        // sent_amount_Id = amountIdList.get(position);
-
-                                        String selectedstateName = DistrictName.get(position);
-                                        String selectedstateId = DistrictId.get(position);
-                                    }
-
-                                    @Override
-                                    public void onNothingSelected(AdapterView<?> arg0) {
-
-                                    }
-                                });
-                            }
-                        }
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
+                    new Thread(() -> {
+                        localCityModels = getJsonLocalcity(response);
+                    }).start();
                 }
             }, new Response.ErrorListener() {
                 @Override
@@ -1648,7 +1851,9 @@ if( !                       ob.getError()){
                 }
             });
             RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
-            stringRequest.setRetryPolicy(new DefaultRetryPolicy(150 * 1000,
+            stringRequest.setRetryPolicy(new
+
+                    DefaultRetryPolicy(150 * 1000,
                     DefaultRetryPolicy.DEFAULT_MAX_RETRIES, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
             requestQueue.add(stringRequest);
         } else {
@@ -1656,60 +1861,91 @@ if( !                       ob.getError()){
         }
     }
 
+    private void setSpinnerDriver() {
+
+
+        runOnUiThread(() -> {
+            DistrictId.add(0, "0");
+            DistrictName.add(0, "---Please Select District---");
+            final ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(Insert_Driver.this, R.layout.cutom_spiner, DistrictName);
+            spinnerArrayAdapter.setDropDownViewResource(R.layout.cutom_spiner); // The drop down view
+            spinner_personal_District.setAdapter(spinnerArrayAdapter);
+            spinner_personal_District.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                    // sent_amount_Id = amountIdList.get(position);
+/*
+                                                String districtnameee = DistrictName.get(position);
+                                                String districtidd = DistrictId.get(position);*/
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> arg0) {
+
+                }
+            });
+
+        });
+    }
+    /*public void setspinnerDrivenfrom(){
+        runOnUiThread(() -> {
+            final ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(Insert_Driver.this, R.layout.cutom_spiner, Driventocity);
+            spinnerArrayAdapter.setDropDownViewResource(R.layout.cutom_spiner); // The drop down view
+            spinner_personal_driven_from.setAdapter(spinnerArrayAdapter);
+            spinner_personal_driven_from.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                    // sent_amount_Id = amountIdList.get(position);
+
+                                               *//* String selectedstateName = Driventocity.get(position);
+                                                String selectedstateId = Driventoid.get(position);*//*
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> arg0) {
+
+                }
+            });
+        });
+
+    }*/
+
     public void getDrivento() {
         if (ApiConstant.isConnected(getApplicationContext())) {
-            StringRequest stringRequest = new StringRequest(Request.Method.GET, ApiConstant.DRIVEN_TO, new Response.Listener<String>() {
+            StringRequest stringRequest = new StringRequest(Request.Method.GET, ApiConstant.LOcal_City, new Response.Listener<String>() {
                 @Override
                 public void onResponse(String response) {
-                    try {
-                        ArrayList<DrivenToModel> districtModels = new ArrayList<>();
-                        JSONObject jsonObject = new JSONObject(response);
-                        boolean error = jsonObject.getBoolean("error");
-                        String message = jsonObject.getString("message");
-                        if (error == false) {
-                            JSONArray jsonArray = jsonObject.getJSONArray("data");
-                            for (int j = 0; j < jsonArray.length(); j++) {
-                                JSONObject jsonObject1 = jsonArray.getJSONObject(j);
-                                String id = jsonObject1.getString("id");
-                                String city = jsonObject1.getString("city");
-                                String state_id = jsonObject1.getString("state_id");
-                                DrivenToModel drivenToModel = new DrivenToModel(id, city, state_id);
-                                drivenToModel.setId(id);
-                                drivenToModel.setCity(city);
-                                drivenToModel.setState_id(state_id);
-                                districtModels.add(drivenToModel);
-                                Driventoid.clear();
-                                Driventocity.clear();
-                                for (int i = 0; i < districtModels.size(); i++) {
-                                    Driventoid.add(districtModels.get(i).getId().toString());
-                                    Driventocity.add(districtModels.get(i).getCity().toString());
+                    new Thread(() -> {
+                        localCityModels = getJsonLocalcity(response);
+
+                        //Driventoid.add(0, "0");
+                        //Driventocity.add(0, "");
+                        runOnUiThread(() -> {
+                            final ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(Insert_Driver.this, R.layout.cutom_spiner, Driventocity);
+                            spinnerArrayAdapter.setDropDownViewResource(R.layout.cutom_spiner); // The drop down view
+                            spinner_personal_driven_to.setAdapter(spinnerArrayAdapter);
+                            spinner_personal_driven_to.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                                @Override
+                                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                                    // sent_amount_Id = amountIdList.get(position);
+
+                                                /*String selectedstateName = Driventocity.get(position);
+                                                String selectedstateId = Driventoid.get(position);*/
+                                }
+
+                                @Override
+                                public void onNothingSelected(AdapterView<?> arg0) {
 
                                 }
-                                Driventoid.add(0, "0");
-                                Driventocity.add(0, "");
-                                final ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(Insert_Driver.this, R.layout.cutom_spiner, Driventocity);
-                                spinnerArrayAdapter.setDropDownViewResource(R.layout.cutom_spiner); // The drop down view
-                                spinner_personal_driven_to.setAdapter(spinnerArrayAdapter);
-                                spinner_personal_driven_to.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                                    @Override
-                                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
-                                        // sent_amount_Id = amountIdList.get(position);
+                            });
 
-                                        String selectedstateName = Driventocity.get(position);
-                                        String selectedstateId = Driventoid.get(position);
-                                    }
 
-                                    @Override
-                                    public void onNothingSelected(AdapterView<?> arg0) {
-
-                                    }
-                                });
-                            }
-                        }
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
+                        });
+                    }).start();
                 }
             }, new Response.ErrorListener() {
                 @Override
@@ -1728,58 +1964,21 @@ if( !                       ob.getError()){
 
     public void getDrivenfrom() {
         if (ApiConstant.isConnected(getApplicationContext())) {
-            StringRequest stringRequest = new StringRequest(Request.Method.GET, ApiConstant.DRIVEN_FROM, new Response.Listener<String>() {
+            StringRequest stringRequest = new StringRequest(Request.Method.GET, ApiConstant.DRIVEN_TO, new Response.Listener<String>() {
                 @Override
                 public void onResponse(String response) {
-                    try {
-                        ArrayList<DrivenToModel> districtModels = new ArrayList<>();
-                        JSONObject jsonObject = new JSONObject(response);
-                        boolean error = jsonObject.getBoolean("error");
-                        String message = jsonObject.getString("message");
-                        if (error == false) {
-                            JSONArray jsonArray = jsonObject.getJSONArray("data");
-                            for (int j = 0; j < jsonArray.length(); j++) {
-                                JSONObject jsonObject1 = jsonArray.getJSONObject(j);
-                                String id = jsonObject1.getString("id");
-                                String city = jsonObject1.getString("city");
-                                String state_id = jsonObject1.getString("state_id");
-                                DrivenToModel drivenToModel = new DrivenToModel(id, city, state_id);
-                                drivenToModel.setId(id);
-                                drivenToModel.setCity(city);
-                                drivenToModel.setState_id(state_id);
-                                districtModels.add(drivenToModel);
-                                Driventoid.clear();
-                                Driventocity.clear();
-                                for (int i = 0; i < districtModels.size(); i++) {
-                                    Driventoid.add(districtModels.get(i).getId().toString());
-                                    Driventocity.add(districtModels.get(i).getCity().toString());
+                    new Thread(() -> {
+                        localCityModels = getJsonLocalcity(response);
 
-                                }
-                                Driventoid.add(0, "0");
-                                Driventocity.add(0, "");
-                                final ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(Insert_Driver.this, R.layout.cutom_spiner, Driventocity);
-                                spinnerArrayAdapter.setDropDownViewResource(R.layout.cutom_spiner); // The drop down view
-                                spinner_personal_driven_from.setAdapter(spinnerArrayAdapter);
-                                spinner_personal_driven_from.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                                    @Override
-                                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
-                                        // sent_amount_Id = amountIdList.get(position);
-
-                                        String selectedstateName = Driventocity.get(position);
-                                        String selectedstateId = Driventoid.get(position);
-                                    }
-
-                                    @Override
-                                    public void onNothingSelected(AdapterView<?> arg0) {
-
-                                    }
-                                });
-                            }
+                        Driventoid.clear();
+                        Driventocity.clear();
+                        for (int i = 0; i < drivenToModels.size(); i++) {
+                            Driventoid.add(drivenToModels.get(i).getId().toString());
+                            Driventocity.add(drivenToModels.get(i).getCity().toString());
                         }
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
+
+
+                    }).start();
                 }
             }, new Response.ErrorListener() {
                 @Override
@@ -1846,11 +2045,13 @@ if( !                       ob.getError()){
                     tv_pan.setVisibility(View.GONE);
                     et_adhar_pan.setVisibility(View.VISIBLE);
                     et_pan.setVisibility(View.GONE);
-                    if (imagee3.equals("")) {
+                   /* if (img_adhar_front.equals("")) {
                         Toast.makeText(Insert_Driver.this, "Please upload adhar front image", Toast.LENGTH_SHORT).show();
-                    } else if (imagee4.equals("")) {
+                    } else if (img_adhar_back.equals("")) {
                         Toast.makeText(Insert_Driver.this, "Please upload adhar back image", Toast.LENGTH_SHORT).show();
-                    }
+
+                    }*/
+
 
                 } else if (tv.getText().equals("Pan Card")) {
                     docs_All_adhar.setVisibility(View.GONE);
@@ -1859,19 +2060,33 @@ if( !                       ob.getError()){
                     tv_pan.setVisibility(View.VISIBLE);
                     et_pan.setVisibility(View.VISIBLE);
                     et_adhar_pan.setVisibility(View.GONE);
-                    if (imagee2.equals("")) {
+                    /*if (img_pan_card.equals("")) {
                         Toast.makeText(Insert_Driver.this, "Please upload pan image", Toast.LENGTH_SHORT).show();
-                    }
+                    }*/
 
                 } else if (tv.getText().equals("Local")) {
 
                     li_spinner_localcity.setVisibility(View.VISIBLE);
                     li_spinner_routes_driven_from.setVisibility(View.GONE);
                     li_spinner_routes_driven_to.setVisibility(View.GONE);
+
+                   /* if (spinner_localcity.getSelectedItem().toString().trim().equals("---Please Select City---")) {
+                        Toast.makeText(Insert_Driver.this, "Please select local city", Toast.LENGTH_SHORT).show();
+                    } else {
+
+                    }*/
+
                 } else if (tv.getText().equals("Outstation")) {
                     li_spinner_localcity.setVisibility(View.GONE);
                     li_spinner_routes_driven_from.setVisibility(View.VISIBLE);
                     li_spinner_routes_driven_to.setVisibility(View.VISIBLE);
+                    /*if (spinner_personal_driven_from.getSelectedItem().toString().trim().equals("")) {
+                        Toast.makeText(Insert_Driver.this, "Please select city", Toast.LENGTH_SHORT).show();
+                    } else if (spinner_personal_driven_to.getSelectedItem().toString().trim().equals("")) {
+                        Toast.makeText(Insert_Driver.this, "Please select city", Toast.LENGTH_SHORT).show();
+                    } else {
+
+                    }*/
                 }
 
                 switch (position) {
@@ -1914,59 +2129,279 @@ if( !                       ob.getError()){
 
     }
 
-    public void setCity(final ArrayList<CityModel> typeArrayList, Spinner spinner) {
 
-        ArrayAdapter<CityModel> modelArrayAdapter = new ArrayAdapter<CityModel>(getApplicationContext(), R.layout.spinner_item, typeArrayList) {
+    @Override
+    public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
 
-            @Override
-            public View getView(int position, View convertView, ViewGroup parent) {
-                View v = convertView;
-                if (v == null) {
-                    LayoutInflater vi = (LayoutInflater) getApplicationContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                    v = vi.inflate(R.layout.spinner_item, null);
-                }
-                TextView tv = (TextView) v.findViewById(R.id.txt_interest);
-                tv.setText(typeArrayList.get(position).getCity());
-
-                switch (position) {
-                    case 0:
-                        tv.setTextColor(Color.GRAY);
-                        break;
-                    default:
-                        tv.setTextColor(Color.GRAY);
-                        break;
-                }
-                return v;
+        if (compoundButton.getId() == R.id.checkbox_tata_ace) {
+            if (checkbox_tata_ace.isChecked())
+                checkBoxArray.add(checkbox_tata_ace.getText().toString().trim());
+            else
+                checkBoxArray.remove(checkbox_tata_ace.getText().toString().trim());}
+            if (compoundButton.getId() == R.id.checkbox_mahindra) {
+                if (checkbox_mahindra.isChecked())
+                    checkBoxArray.add("Mahindra Pick-Up");
+                else
+                    checkBoxArray.remove("Mahindra Pick-Up");
             }
 
-            @Override
-            public View getDropDownView(int position, View convertView, ViewGroup parent) {
-                View v = convertView;
-                if (v == null) {
-                    Context mContext = this.getContext();
-                    LayoutInflater vi = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                    v = vi.inflate(R.layout.spinner_item, null);
-                }
-
-                TextView tv = (TextView) v.findViewById(R.id.txt_interest);
-
-                tv.setText(typeArrayList.get(position).getCity());
-
-                switch (position) {
-                    case 0:
-                        tv.setTextColor(Color.GRAY);
-                        break;
-                    default:
-                        tv.setTextColor(Color.GRAY);
-                        break;
-                }
-                return v;
+            if (compoundButton.getId() == R.id.checkbox_407) {
+                if (checkbox_407.isChecked())
+                    checkBoxArray.add(checkbox_407.getText().toString().trim());
+                else
+                    checkBoxArray.remove(checkbox_407.getText().toString().trim());
             }
-        };
-        spinner.setAdapter(modelArrayAdapter);
-        modelArrayAdapter.notifyDataSetChanged();
+
+            if (compoundButton.getId() == R.id.checkbox_1109) {
+                if (checkbox_1109.isChecked())
+                    checkBoxArray.add(checkbox_1109.getText().toString().trim());
+                else
+                    checkBoxArray.remove(checkbox_1109.getText().toString().trim());
+            }
+        if (compoundButton.getId() == R.id.checkbox_10tyre) {
+            if (checkbox_10tyre.isChecked()) {
+                checkBoxArray.add(checkbox_10tyre.getText().toString().trim());
+              //  Toast.makeText(this, ""+checkBoxArray.size(), Toast.LENGTH_SHORT).show();
+            }
+            else{
+                checkBoxArray.remove(checkbox_10tyre.getText().toString().trim());
+               // Toast.makeText(this, ""+checkBoxArray.size(), Toast.LENGTH_SHORT).show();
+            }
+        }
+        if (compoundButton.getId() == R.id.checkbox_12tyre) {
+            if (checkbox_12tyre.isChecked()) {
+                checkBoxArray.add(checkbox_12tyre.getText().toString().trim());
+              //  Toast.makeText(this, ""+checkBoxArray.size(), Toast.LENGTH_SHORT).show();
+            }
+            else{
+                checkBoxArray.remove(checkbox_12tyre.getText().toString().trim());
+             //   Toast.makeText(this, ""+checkBoxArray.size(), Toast.LENGTH_SHORT).show();
+
+            }
+
+        }
+        if (compoundButton.getId() == R.id.checkbox_t14tyre) {
+            if (checkbox_t14tyre.isChecked())
+                checkBoxArray.add(checkbox_t14tyre.getText().toString().trim());
+            else
+                checkBoxArray.remove(checkbox_t14tyre.getText().toString().trim());
+        }
+        if (compoundButton.getId() == R.id.checkbox_32feetsxl) {
+            if (checkbox_32feetsxl.isChecked())
+                checkBoxArray.add(checkbox_32feetsxl.getText().toString().trim());
+            else
+                checkBoxArray.remove(checkbox_32feetsxl.getText().toString().trim());
+        }
+        if (compoundButton.getId() == R.id.checkbox_32feetmxl) {
+            if (checkbox_32feetmxl.isChecked())
+                checkBoxArray.add(checkbox_32feetmxl.getText().toString().trim());
+            else
+                checkBoxArray.remove(checkbox_32feetmxl.getText().toString().trim());
+        }
+        if (compoundButton.getId() == R.id.checkbox_trailer) {
+            if (checkbox_trailer.isChecked())
+                checkBoxArray.add(checkbox_trailer.getText().toString().trim());
+            else
+                checkBoxArray.remove(checkbox_trailer.getText().toString().trim());
+        }
+        if (compoundButton.getId() == R.id.checkbox_tanker) {
+            if (checkbox_tanker.isChecked())
+                checkBoxArray.add(checkbox_tanker.getText().toString().trim());
+            else
+                checkBoxArray.remove(checkbox_tanker.getText().toString().trim());
+        }
+
 
     }
+
+
+    private class asynkdistrict extends AsyncTask<String, String, String>
+    {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            dialog.show();
+
+        }
+
+        @Override
+        protected String doInBackground(String... arg0) {
+            OkHttpClient client = new OkHttpClient();
+            try {
+                RequestBody formBody = new FormBody.Builder()
+                       /* .add("mobile_no", mobilefp)
+                        .add("password", confirmp)*/
+                        .build();
+
+                okhttp3.Request.Builder builder = new okhttp3.Request.Builder();
+                builder.url(ApiConstant.DISTRICT);
+                builder.get();
+                okhttp3.Request request = builder.build();
+                okhttp3.Response response = client.newCall(request).execute();
+
+                return response.body().string();
+
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            return null;
+
+        }
+
+
+        //run on main thread
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+            dialog.dismiss();
+            try {
+                JSONObject jsn = null;
+                if (!TextUtils.isEmpty(result)) {
+                    jsn = new JSONObject(result);
+                    boolean error=jsn.getBoolean("error");
+                    String message=jsn.getString("message");
+                    JSONArray jsonArray=jsn.getJSONArray("data");
+                    for (int i=0;i<jsonArray.length();i++){
+                        JSONObject jsonObject1=jsonArray.getJSONObject(i);
+                        String id=jsonObject1.getString("id");
+                        String district=jsonObject1.getString("district");
+                        DistrictModel districtModel=new DistrictModel(id,district);
+                        districtModel.setId(id);
+                        districtModel.setDistrict(district);
+                        districtModels.add(districtModel);
+                        DistrictId.clear();
+                        DistrictName.clear();
+                        for (int j = 0; j < districtModels.size(); j++) {
+                            DistrictId.add(districtModels.get(j).getId().toString());
+                            DistrictName.add(districtModels.get(j).getDistrict().toString());
+                        }
+                    }
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            DistrictId.add(0, "0");
+            DistrictName.add(0, "---Please Select District---");
+           final ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(Insert_Driver.this, R.layout.cutom_spiner, DistrictName);
+             spinnerArrayAdapter.setDropDownViewResource(R.layout.cutom_spiner); // The drop down view
+            spinner_personal_District.setAdapter(spinnerArrayAdapter);
+            spinner_personal_District.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                    // sent_amount_Id = amountIdList.get(position);
+
+                                                String districtnameee = DistrictName.get(position);
+                                                String districtidd = DistrictId.get(position);
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> arg0) {
+
+                }
+            });
+
+        }
+    }
+
+    /*private class asynkgetdrivenfrom extends AsyncTask<String, String, String>
+    {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            dialogLoyalty = new ProgressDialog(Insert_Driver.this);
+            dialogLoyalty.setMessage("Please wait...");
+            dialogLoyalty.setCancelable(false);
+            dialogLoyalty.show();
+
+        }
+
+        @Override
+        protected String doInBackground(String... arg0) {
+            OkHttpClient client = new OkHttpClient();
+            try {
+                RequestBody formBody = new FormBody.Builder()
+                        *//* .add("mobile_no", mobilefp)
+                         .add("password", confirmp)*//*
+                        .build();
+
+                okhttp3.Request.Builder builder = new okhttp3.Request.Builder();
+                builder.url(ApiConstant.DRIVEN_FROM);
+                builder.get();
+                okhttp3.Request request = builder.build();
+                okhttp3.Response response = client.newCall(request).execute();
+
+                return response.body().string();
+
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            return null;
+
+        }
+
+
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+            if (dialogLoyalty.isShowing())
+                dialogLoyalty.dismiss();
+            try {
+                JSONObject jsn = null;
+                if (!TextUtils.isEmpty(result)) {
+                    jsn = new JSONObject(result);
+                    boolean error=jsn.getBoolean("error");
+                    String message=jsn.getString("message");
+                    JSONArray jsonArray=jsn.getJSONArray("data");
+                    for (int i=0;i<jsonArray.length();i++){
+                        JSONObject jsonObject1=jsonArray.getJSONObject(i);
+                        String id=jsonObject1.getString("id");
+                        String city=jsonObject1.getString("city");
+                        String state_id=jsonObject1.getString("state_id");
+                        DrivenfromModel drivenfromModel1=new DrivenfromModel(id,city,state_id);
+
+                        drivenfromModel.add(drivenfromModel1);
+
+                        Drivenfromid.clear();
+                        Drivenfromcity.clear();
+                        for (int j = 0; j < drivenfromModel.size(); j++) {
+                            Drivenfromid.add(drivenfromModel.get(j).getId().toString());
+                            Drivenfromcity.add(drivenfromModel.get(j).getCity().toString());
+                        }
+                    }
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            Drivenfromid.add(0, "0");
+            Drivenfromcity.add(0, "");
+            final ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(Insert_Driver.this, R.layout.cutom_spiner, DistrictName);
+            spinnerArrayAdapter.setDropDownViewResource(R.layout.cutom_spiner); // The drop down view
+            spinner_personal_driven_from.setAdapter(spinnerArrayAdapter);
+            spinner_personal_driven_from.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                    // sent_amount_Id = amountIdList.get(position);
+
+                  *//*  String districtnameee = DistrictName.get(position);
+                    String districtidd = DistrictId.get(position);*//*
+                }
+
+                @Override
+                public void onNothingSelected(AdapterView<?> arg0) {
+
+                }
+            });
+
+        }
+    }*/
 
     public void dismissDialog() {
         if (dialog != null && dialog.isShowing()) {
@@ -1980,6 +2415,112 @@ if( !                       ob.getError()){
         if (dialog != null && dialog.isShowing()) {
             dialog.dismiss();
         }
+    }
+
+
+    public void getlicincevalidity() {
+
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, ApiConstant.Licnce_validty, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                // progressBar.setVisibility(View.GONE);
+
+                try {
+                    JSONObject jsonObject = new JSONObject(response);
+                    boolean error = jsonObject.getBoolean("error");
+                    String message = jsonObject.getString("message");
+                    String data = jsonObject.getString("data");
+
+                    if (!error) {
+                        Toast.makeText(Insert_Driver.this, message, Toast.LENGTH_SHORT).show();
+                        getalertfailurelicense();
+                    }
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+            }
+        }, new com.android.volley.Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                //   progressBar.setVisibility(View.GONE);
+                Log.e("error", error.toString());
+                Toast.makeText(Insert_Driver.this, error.toString(), Toast.LENGTH_SHORT).show();
+                AlertDialog.Builder al = new AlertDialog.Builder(Insert_Driver.this);
+                String mesaage = null;
+                if (error instanceof NetworkError) {
+                    mesaage = "Cannot connect to Internet...Please check your connection!";
+                } else if (error instanceof ServerError) {
+                    mesaage = "The server could not be found. Please try again after some time!!";
+                } else if (error instanceof AuthFailureError) {
+                    mesaage = "Cannot connect to Internet...Authfailure!";
+                } else if (error instanceof NoConnectionError) {
+                    mesaage = "Cannot connect to Internet...NoConnectionError!";
+                } else if (error instanceof TimeoutError) {
+                    mesaage = "Connection TimeOut! TimeoutError.";
+                }
+                al.setTitle("Service Response....");
+                al.setMessage(mesaage);
+                al.show();
+            }
+        }) {
+            @Override
+            protected Map<String, String> getParams() {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("driver_dlno", etdriving_license_no.getText().toString());
+                return params;
+            }
+
+            @Override
+            public RetryPolicy getRetryPolicy() {
+                RetryPolicy retryPolicy = new DefaultRetryPolicy(60 * 1000,
+                        DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                        DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
+                return retryPolicy;
+            }
+        };
+        AppController.getInstance().addToRequestQueue(stringRequest);
+        //progressBar.setVisibility(View.VISIBLE);
+        stringRequest.setRetryPolicy(new DefaultRetryPolicy(
+                60 * 1000,
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+    }
+
+    private void getalertfailurelicense() {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(Insert_Driver.this);
+        LayoutInflater inflater = getLayoutInflater();
+        View loyaltyView = inflater.inflate(R.layout.alert_exit_ui, null);
+
+        builder.setView(loyaltyView);
+
+        TextView textView = (TextView) loyaltyView.findViewById(R.id.alert_textview);
+        TextView textView1 = (TextView) loyaltyView.findViewById(R.id.alert_textview1);
+
+        textView.setText("License Number already Exists");
+        textView.setGravity(Gravity.CENTER);
+        textView1.setText("Oops!");
+        textView1.setGravity(Gravity.CENTER);
+        RelativeLayout OkayButton = loyaltyView.findViewById(R.id.btn_positive_alert);
+        RelativeLayout cancleButton = loyaltyView.findViewById(R.id.btn_negative_alert);
+        cancleButton.setVisibility(View.GONE);
+        dialogLoyalty = builder.create();
+        OkayButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                etdriving_license_no.setText("");
+                dialogLoyalty.dismiss();
+            }
+        });
+        Objects.requireNonNull(dialogLoyalty.getWindow()).setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+        if (!this.isFinishing()) {
+            dialogLoyalty.setCancelable(false);
+            dialogLoyalty.show();
+        }
+
     }
 
 
@@ -2037,11 +2578,13 @@ if( !                       ob.getError()){
                 al.setMessage(mesaage);
                 al.show();
             }
-        })
-            {
+        }) {
             @Override
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<String, String>();
+
+                params.put("vehincles_checkbox", String.valueOf(checkBoxArray).replace("[","").replace("]",""));
+
                 params.put("driver_name", etFname.getText().toString());
                 params.put("driver_number1", etphone1.getText().toString());
                 params.put("driver_number2", etphone2.getText().toString());
@@ -2053,7 +2596,7 @@ if( !                       ob.getError()){
                 params.put("driver_state", spinner_personal_statee.getSelectedItem().toString());
                 params.put("driver_district", spinner_personal_District.getSelectedItem().toString());
                 params.put("driver_street", etstreet.getText().toString());
-                params.put("vehincles_checkbox", checkboxdisplay);
+
                 params.put("driver_source", spinner_personal_driven_from.getSelectedItem().toString());
                 params.put("driver_dest", spinner_personal_driven_to.getSelectedItem().toString());
                 params.put("driver_dlno", etdriving_license_no.getText().toString());
@@ -2078,13 +2621,12 @@ if( !                       ob.getError()){
                 params.put("address_proof", imagee5);
                 params.put("Ref_address_proof2", imagee6);
 
-
                 return params;
             }
 
             @Override
             public RetryPolicy getRetryPolicy() {
-                RetryPolicy retryPolicy = new DefaultRetryPolicy(10*60*1000,
+                RetryPolicy retryPolicy = new DefaultRetryPolicy(10 * 60 * 1000,
                         DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
                         DefaultRetryPolicy.DEFAULT_BACKOFF_MULT);
                 return retryPolicy;
@@ -2093,7 +2635,7 @@ if( !                       ob.getError()){
         AppController.getInstance().addToRequestQueue(stringRequest);
         dialog.show();
         stringRequest.setRetryPolicy(new DefaultRetryPolicy(
-                10*60*1000,
+                10 * 60 * 1000,
                 DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
                 DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         /*stringRequest.setRetryPolicy(new DefaultRetryPolicy(
@@ -2117,10 +2659,12 @@ if( !                       ob.getError()){
         TextView textView1 = (TextView) loyaltyView.findViewById(R.id.alert_textview1);
 
         textView.setText("Data Inserted Successfully...");
+        textView.setGravity(Gravity.CENTER);
         textView1.setText("Thank You");
+        textView1.setGravity(Gravity.CENTER);
         RelativeLayout OkayButton = loyaltyView.findViewById(R.id.btn_positive_alert);
-         RelativeLayout cancleButton = loyaltyView.findViewById(R.id.btn_negative_alert);
-         cancleButton.setVisibility(View.GONE);
+        RelativeLayout cancleButton = loyaltyView.findViewById(R.id.btn_negative_alert);
+        cancleButton.setVisibility(View.GONE);
         dialogLoyalty = builder.create();
         OkayButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -2145,8 +2689,6 @@ if( !                       ob.getError()){
 
 
     }
-
-
 
 
 }
